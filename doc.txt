@@ -1,0 +1,47 @@
+Here are the API endpoints for testing in Postman.
+
+Base URL: http://localhost:8010/api
+
+📋 Authentication Endpoints
+No authentication required for these.
+
+Method	Endpoint	Description
+POST	/auth/register	Register a new user
+POST	/auth/login	Login and receive a JWT token
+👤 User Endpoints
+Requires Authorization: Bearer <token>
+
+Method	Endpoint	Description
+GET	/user/current-user	Get current logged-in user details
+PUT	/user/update	Update profile (supports profilePicture upload)
+💸 Transaction Endpoints
+Requires Authorization: Bearer <token>
+
+Method	Endpoint	Description
+GET	/transaction/all	List all user transactions
+GET	/transaction/:id	Get details of a specific transaction
+POST	/transaction/create	Create a new transaction
+POST	/transaction/scan-receipt	Scan receipt (supports receipt file upload)
+POST	/transaction/bulk-transaction	Create multiple transactions at once
+PUT	/transaction/update/:id	Update a specific transaction
+PUT	/transaction/duplicate/:id	Duplicate an existing transaction
+DELETE	/transaction/delete/:id	Delete a specific transaction
+DELETE	/transaction/bulk-delete	Delete multiple transactions
+📊 Analytics Endpoints
+Requires Authorization: Bearer <token>
+
+Method	Endpoint	Description
+GET	/analytics/summary	Get financial summary (Income vs Expense)
+GET	/analytics/chart	Get data for time-series charts
+GET	/analytics/expense-breakdown	Get pie chart data for expenses
+📄 Report Endpoints
+Requires Authorization: Bearer <token>
+
+Method	Endpoint	Description
+GET	/report/all	List all generated reports
+GET	/report/generate	Generate a new monthly/custom report
+PUT	/report/update-setting	Update automated report settings
+💡 Postman Tips:
+Authorization: After logging in, copy the accessToken and paste it into the Auth tab of your Postman collection or request. Select Bearer Token as the type.
+Body (JSON): For POST and PUT requests, set the Body to raw and select JSON.
+File Uploads: For /user/update and /transaction/scan-receipt, use the form-data body type and set the key to profilePicture or receipt respectively with the file selected.
