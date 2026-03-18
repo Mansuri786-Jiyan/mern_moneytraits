@@ -7,32 +7,30 @@ const useAuthExpiration = () => {
     const dispatch = useAppDispatch();
     const [refreshToken] = useRefreshMutation();
     useEffect(() => {
-        const handleLogout = () => {
-            console.log("Token expired, logging out...");
-            dispatch(logout());
-        };
         const handleTokenRefresh = async () => {
             try {
-                const { accessToken, expiresAt } = await refreshToken({}).unwrap();
-                dispatch(updateCredentials({ accessToken, expiresAt }));
-                console.log("Token refreshed successfully");
+                const refreshed = await refreshToken({}).unwrap();
+                dispatch(updateCredentials({
+                    accessToken: refreshed.accessToken,
+                    expiresAt: refreshed.expiresAt,
+                }));
             }
             catch (error) {
                 console.error("Token refresh failed, logging out...", error);
-                handleLogout();
+                dispatch(logout());
             }
         };
+
         if (accessToken && expiresAt) {
+            const REFRESH_BUFFER_MS = 60 * 1000;
             const currentTime = Date.now();
             const timeUntilExpiration = expiresAt - currentTime;
-            if (timeUntilExpiration <= 0) {
-                // Token is already expired
+
+            if (timeUntilExpiration <= REFRESH_BUFFER_MS) {
                 handleTokenRefresh();
             }
             else {
-                // Set a timeout to log out the user when the token expires
-                const timer = setTimeout(handleLogout, timeUntilExpiration);
-                // Cleanup the timer on component unmount or token change
+                const timer = setTimeout(handleTokenRefresh, timeUntilExpiration - REFRESH_BUFFER_MS);
                 return () => clearTimeout(timer);
             }
         }

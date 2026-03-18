@@ -21,7 +21,6 @@ const envConfig = () => {
         MAIL_PASS: getEnv("MAIL_PASS"),
         FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN", "localhost"),
     };
-    console.log("Runtime Env Config:", { ...config, MONGO_URI: "***", JWT_SECRET: "***", GEMINI_API_KEY: "***" });
     return config;
 };
 

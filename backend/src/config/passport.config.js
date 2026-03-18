@@ -10,21 +10,16 @@ const options = {
 
 passport.use(new Strategy(options, async (payload, done) => {
     try {
-        console.log("Passport JWT Payload:", payload);
         if (!payload.userId) {
-            console.log("Passport: Missing userId in payload");
             return done(null, false, { message: "Invalid token payload" });
         }
         const user = await findByIdUserService(payload.userId);
         if (!user) {
-            console.log("Passport: User not found for userId:", payload.userId);
             return done(null, false);
         }
-        console.log("Passport: Authentication successful for user:", user._id);
         return done(null, user);
     }
     catch (error) {
-        console.error("Passport Strategy Error:", error);
         return done(error, false);
     }
 }));

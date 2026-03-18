@@ -27,6 +27,7 @@ const buttonVariants = cva("inline-flex cursor-pointer items-center justify-cent
 });
 function Button({ className, variant, size, asChild = false, ...props }) {
     const Comp = asChild ? Slot : "button";
-    return (_jsx(Comp, { "data-slot": "button", className: cn(buttonVariants({ variant, size, className })), ...props }));
+    const { key: _ignoredKey, ...restProps } = props;
+    return (_jsx(Comp, { "data-slot": "button", className: cn(buttonVariants({ variant, size, className })), ...restProps }));
 }
 export { Button, buttonVariants };
