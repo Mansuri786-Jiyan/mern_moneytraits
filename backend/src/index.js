@@ -34,13 +34,6 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-    console.log("Content-Type:", req.headers["content-type"]);
-    console.log("Body Type:", typeof req.body);
-    console.log("Body:", JSON.stringify(req.body));
-    next();
-});
 
 app.get("/", asyncHandler(async (req, res, next) => {
     res.status(HTTPSTATUS.OK).json({

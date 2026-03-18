@@ -4,7 +4,6 @@ import { registerSchema, loginSchema } from "../validators/auth.validator.js";
 import { registerService, loginService } from "../services/auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
-    console.log("Register Request Body:", req.body);
     const body = registerSchema.parse(req.body);
     const result = await registerService(body);
     return res.status(HTTPSTATUS.CREATED).json({
