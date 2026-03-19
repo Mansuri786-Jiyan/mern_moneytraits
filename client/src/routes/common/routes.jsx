@@ -5,6 +5,7 @@ import SignUp from "@/pages/auth/sign-up";
 import Dashboard from "@/pages/dashboard";
 import Transactions from "@/pages/transactions";
 import Reports from "@/pages/reports";
+import Admin from "@/pages/admin";
 import Settings from "@/pages/settings";
 import Account from "@/pages/settings/account";
 import Appearance from "@/pages/settings/appearance";
@@ -17,6 +18,7 @@ export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}) },
     { path: PROTECTED_ROUTES.TRANSACTIONS, element: _jsx(Transactions, {}) },
     { path: PROTECTED_ROUTES.REPORTS, element: _jsx(Reports, {}) },
+    { path: PROTECTED_ROUTES.ADMIN, element: _jsx(Admin, {}) },
     { path: PROTECTED_ROUTES.SETTINGS,
         element: _jsx(Settings, {}),
         children: [

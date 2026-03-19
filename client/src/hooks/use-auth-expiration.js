@@ -13,6 +13,7 @@ const useAuthExpiration = () => {
                 dispatch(updateCredentials({
                     accessToken: refreshed.accessToken,
                     expiresAt: refreshed.expiresAt,
+                    user: refreshed.user,
                 }));
             }
             catch (error) {

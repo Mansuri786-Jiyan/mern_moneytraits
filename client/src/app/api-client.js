@@ -31,6 +31,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
             api.dispatch(updateCredentials({
                 accessToken: refreshResult.data.accessToken,
                 expiresAt: refreshResult.data.expiresAt,
+                user: refreshResult.data.user,
             }));
 
             result = await rawBaseQuery(args, api, extraOptions);
@@ -47,6 +48,6 @@ export const apiClient = createApi({
     reducerPath: "api", // Add API client reducer to root reducer
     baseQuery: baseQueryWithReauth,
     refetchOnMountOrArgChange: true, // Refetch on mount or arg change
-    tagTypes: ["transactions", "analytics", "billingSubscription"], // Tag types for RTK Query
+    tagTypes: ["transactions", "analytics", "billingSubscription", "users"], // Tag types for RTK Query
     endpoints: () => ({}), // Endpoints for RTK Query
 });

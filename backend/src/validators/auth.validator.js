@@ -13,6 +13,12 @@ export const registerSchema = z.object({
     name: z.string().trim().min(1).max(255),
     email: emailSchema,
     password: passwordSchema,
+    role: z
+        .string()
+        .trim()
+        .toUpperCase()
+        .pipe(z.enum(["USER", "ADMIN"]))
+        .optional(),
 });
 
 export const loginSchema = z.object({

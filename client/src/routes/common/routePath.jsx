@@ -9,6 +9,7 @@ export const PROTECTED_ROUTES = {
     OVERVIEW: "/overview",
     TRANSACTIONS: "/transactions",
     REPORTS: "/reports",
+    ADMIN: "/admin",
     SETTINGS: "/settings",
     SETTINGS_APPEARANCE: "/settings/appearance",
     SETTINGS_BILLING: "/settings/billing",

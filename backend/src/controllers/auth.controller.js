@@ -5,7 +5,9 @@ import { registerService, loginService, refreshTokenService } from "../services/
 
 export const registerController = asyncHandler(async (req, res) => {
     const body = registerSchema.parse(req.body);
+
     const result = await registerService(body);
+
     return res.status(HTTPSTATUS.CREATED).json({
         message: "User registered successfully",
         data: result,

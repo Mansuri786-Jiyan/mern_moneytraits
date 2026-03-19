@@ -1,5 +1,5 @@
 import UserModel from "../models/user.model.js";
-import { UnauthorizedException, NotFoundException } from "../utils/app-error.js";
+import { BadRequestException, UnauthorizedException, NotFoundException } from "../utils/app-error.js";
 import ReportSettingModel, { ReportFrequencyEnum } from "../models/report-setting.model.js";
 import { calulateNextReportDate } from "../utils/helper.js";
 import { signJwtToken } from "../utils/jwt.js";
@@ -7,14 +7,25 @@ import jwt from "jsonwebtoken";
 import { Env } from "../config/env.config.js";
 
 export const registerService = async (body) => {
-    const { email } = body;
+    const { name, email, password, role } = body;
+
     const existingUser = await UserModel.findOne({ email });
-    if (existingUser)
+    if (existingUser) {
         throw new UnauthorizedException("User already exists");
+    }
+
+    let roleToAssign = "USER";
+    if (role === "ADMIN") {
+        roleToAssign = "ADMIN";
+    }
 
     const newUser = new UserModel({
-        ...body,
+        name,
+        email,
+        password,
+        role: roleToAssign,
     });
+
     await newUser.save();
 
     const reportSetting = new ReportSettingModel({
@@ -24,10 +35,13 @@ export const registerService = async (body) => {
         nextReportDate: calulateNextReportDate(),
         lastSentDate: null,
     });
+
     await reportSetting.save();
 
     return { user: newUser.omitPassword() };
 };
+
+
 
 export const loginService = async (body) => {
     const { email, password } = body;
@@ -78,5 +92,6 @@ export const refreshTokenService = async (accessToken) => {
     return {
         accessToken: token,
         expiresAt,
+        user: user.omitPassword(),
     };
 };

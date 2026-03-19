@@ -1,5 +1,14 @@
-import "dotenv/config";
+import { config } from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { getEnv } from "../utils/get-env.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+config({
+    path: path.resolve(__dirname, "../../.env"),
+});
 
 const envConfig = () => {
     const config = {

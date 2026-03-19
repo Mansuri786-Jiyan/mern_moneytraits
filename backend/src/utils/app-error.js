@@ -34,6 +34,12 @@ export class UnauthorizedException extends AppError {
     }
 }
 
+export class ForbiddenException extends AppError {
+    constructor(message = "Forbidden", errorCode) {
+        super(message, HTTPSTATUS.FORBIDDEN, errorCode || ErrorCodeEnum.ACCESS_UNAUTHORIZED);
+    }
+}
+
 export class InternalServerException extends AppError {
     constructor(message = "Internal Server Error", errorCode) {
         super(message, HTTPSTATUS.INTERNAL_SERVER_ERROR, errorCode || ErrorCodeEnum.INTERNAL_SERVER_ERROR);

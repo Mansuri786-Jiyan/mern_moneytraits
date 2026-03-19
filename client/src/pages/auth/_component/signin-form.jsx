@@ -31,7 +31,12 @@ const SignInForm = ({ className, ...props }) => {
             dispatch(setCredentials(data));
             toast.success("Login successful");
             setTimeout(() => {
-                navigate(PROTECTED_ROUTES.OVERVIEW);
+                if (data.user.role === "ADMIN") {
+                    navigate(PROTECTED_ROUTES.ADMIN);
+                }
+                else {
+                    navigate(PROTECTED_ROUTES.OVERVIEW);
+                }
             }, 1000);
         })
             .catch((error) => {

@@ -6,6 +6,7 @@ const AuthRoute = () => {
     const { accessToken, user } = useTypedSelector((state) => state.auth);
     if (!accessToken && !user)
         return _jsx(Outlet, {});
-    return _jsx(Navigate, { to: PROTECTED_ROUTES.OVERVIEW, replace: true });
+    const redirectPath = user?.role === "ADMIN" ? PROTECTED_ROUTES.ADMIN : PROTECTED_ROUTES.OVERVIEW;
+    return _jsx(Navigate, { to: redirectPath, replace: true });
 };
 export default AuthRoute;
