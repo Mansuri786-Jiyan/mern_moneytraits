@@ -103,7 +103,6 @@ export const summaryAnalyticsService = async (userId, dateRangePreset, customFro
         expenseRatio: 0,
         savingsPercentage: 0,
     }, } = current || {};
-    console.log(current, "current");
     let percentageChange = {
         income: 0,
         expenses: 0,
@@ -119,14 +118,12 @@ export const summaryAnalyticsService = async (userId, dateRangePreset, customFro
     if (from && to && rangeValue !== DateRangeEnum.ALL_TIME) {
         //last 30 days  previous las 30 days,
         const period = differenceInDays(to, from) + 1;
-        console.log(`${differenceInDays(to, from)}`, period, "period");
         const isYearly = [
             DateRangeEnum.LAST_YEAR,
             DateRangeEnum.THIS_YEAR,
         ].includes(rangeValue);
         const prevPeriodFrom = isYearly ? subYears(from, 1) : subDays(from, period);
         const prevPeriodTo = isYearly ? subYears(to, 1) : subDays(to, period);
-        console.log(prevPeriodFrom, prevPeriodTo, "Prev date");
         const prevPeriodPipeline = [
             {
                 $match: {
@@ -162,7 +159,6 @@ export const summaryAnalyticsService = async (userId, dateRangePreset, customFro
             },
         ];
         const [previous] = await TransactionModel.aggregate(prevPeriodPipeline);
-        console.log(previous, "Prvious Data");
         if (previous) {
             const prevIncome = previous.totalIncome || 0;
             const prevExpenses = previous.totalExpenses || 0;

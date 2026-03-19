@@ -3,14 +3,11 @@ import { processRecurringTransactions } from "./jobs/transaction.job.js";
 import { processReportJob } from "./jobs/report.job.js";
 
 const scheduleJob = (name, time, job) => {
-    console.log(`Scheduling ${name} at ${time}`);
     return cron.schedule(time, async () => {
         try {
             await job();
-            console.log(`${name} completed`);
         }
         catch (error) {
-            console.log(`${name} failed`, error);
         }
     }, {
         scheduled: true,

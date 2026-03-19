@@ -16,7 +16,6 @@ export const sendReportEmail = async (params) => {
 
     ${report.insights.join("\n")}
 `;
-    console.log(text, "text mail");
     return sendEmail({
         to: email,
         subject: `${frequency} Financial Report - ${report.period}`,

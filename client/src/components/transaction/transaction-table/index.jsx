@@ -32,7 +32,6 @@ const TransactionTable = (props) => {
         pageSize: filter.pageSize,
     };
     const handleSearch = (value) => {
-        console.log(debouncedTerm);
         setSearchTerm(value);
     };
     const handleFilterChange = (filters) => {

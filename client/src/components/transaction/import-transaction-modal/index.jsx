@@ -22,7 +22,6 @@ const ImportTransactionModal = () => {
         { fieldName: 'paymentMethod', required: true },
         { fieldName: 'description', required: false },
     ];
-    // console.log(transactionFields, file, csvColumns, csvData, mappings);
     const handleFileUpload = (file, columns, data) => {
         setFile(file);
         setCsvColumns(columns);

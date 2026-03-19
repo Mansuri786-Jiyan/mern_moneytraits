@@ -22,6 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
+
 app.use(cors({
     origin(origin, callback) {
         if (!origin || origin === Env.FRONTEND_ORIGIN || /^https?:\/\/localhost:\d+$/.test(origin)) {
@@ -53,5 +54,4 @@ app.listen(Env.PORT, async () => {
     if (Env.NODE_ENV === "development") {
         await initializeCrons();
     }
-    console.log(`Server is running on port ${Env.PORT} in ${Env.NODE_ENV} mode`);
 });

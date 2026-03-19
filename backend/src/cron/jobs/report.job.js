@@ -22,17 +22,14 @@ export const processReportJob = async () => {
         })
             .populate("userId")
             .cursor();
-        console.log("Running report ");
         for await (const setting of reportSettingCursor) {
             const user = setting.userId;
             if (!user) {
-                console.log(`User not found for setting: ${setting._id}`);
                 continue;
             }
             const session = await mongoose.startSession();
             try {
                 const report = await generateReportService(user.id, from, to);
-                console.log(report, "resport data");
                 let emailSent = false;
                 if (report) {
                     try {
@@ -53,7 +50,6 @@ export const processReportJob = async () => {
                         emailSent = true;
                     }
                     catch (error) {
-                        console.log(`Email failed for ${user.id}`);
                     }
                 }
                 await session.withTransaction(async () => {
@@ -124,15 +120,12 @@ export const processReportJob = async () => {
                 processedCount++;
             }
             catch (error) {
-                console.log(`Failed to process report`, error);
                 failedCount++;
             }
             finally {
                 await session.endSession();
             }
         }
-        console.log(`✅Processed: ${processedCount} report`);
-        console.log(`❌ Failed: ${failedCount} report`);
         return {
             success: true,
             processedCount,

@@ -15,10 +15,10 @@ export const authenticationRoutePaths = [
     { path: AUTH_ROUTES.SIGN_UP, element: _jsx(SignUp, {}) },
 ];
 export const protectedRoutePaths = [
-    { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}) },
-    { path: PROTECTED_ROUTES.TRANSACTIONS, element: _jsx(Transactions, {}) },
-    { path: PROTECTED_ROUTES.REPORTS, element: _jsx(Reports, {}) },
-    { path: PROTECTED_ROUTES.ADMIN, element: _jsx(Admin, {}) },
+    { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}), userOnly: true },
+    { path: PROTECTED_ROUTES.TRANSACTIONS, element: _jsx(Transactions, {}), userOnly: true },
+    { path: PROTECTED_ROUTES.REPORTS, element: _jsx(Reports, {}), userOnly: true },
+    { path: PROTECTED_ROUTES.ADMIN, element: _jsx(Admin, {}), adminOnly: true },
     { path: PROTECTED_ROUTES.SETTINGS,
         element: _jsx(Settings, {}),
         children: [

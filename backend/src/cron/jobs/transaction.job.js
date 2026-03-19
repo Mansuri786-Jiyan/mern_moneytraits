@@ -11,7 +11,6 @@ export const processRecurringTransactions = async () => {
             isRecurring: true,
             nextRecurringDate: { $lte: now },
         }).cursor();
-        console.log("Starting recurring proccess");
         for await (const tx of transactionCursor) {
             const nextDate = calculateNextOccurrence(tx.nextRecurringDate, tx.recurringInterval);
             const session = await mongoose.startSession();
@@ -44,14 +43,11 @@ export const processRecurringTransactions = async () => {
             }
             catch (error) {
                 failedCount++;
-                console.log(`Failed reccurring tx: ${tx._id}`, error);
             }
             finally {
                 await session.endSession();
             }
         }
-        console.log(`✅Processed: ${processedCount} transaction`);
-        console.log(`❌ Failed: ${failedCount} transaction`);
         return {
             success: true,
             processedCount,

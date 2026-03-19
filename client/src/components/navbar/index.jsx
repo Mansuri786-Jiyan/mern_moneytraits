@@ -15,30 +15,35 @@ const Navbar = () => {
     const { user } = useTypedSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
-    const routes = [
-        {
-            href: PROTECTED_ROUTES.OVERVIEW,
-            label: "Overview",
-        },
-        {
-            href: PROTECTED_ROUTES.TRANSACTIONS,
-            label: "Transactions",
-        },
-        {
-            href: PROTECTED_ROUTES.REPORTS,
-            label: "Reports",
-        },
-        ...(user?.role === "ADMIN"
-            ? [{
-                    href: PROTECTED_ROUTES.ADMIN,
-                    label: "Admin",
-                }]
-            : []),
-        {
-            href: PROTECTED_ROUTES.SETTINGS,
-            label: "Settings",
-        },
-    ];
+    const routes = user?.role === "ADMIN"
+        ? [
+            {
+                href: PROTECTED_ROUTES.ADMIN,
+                label: "Admin",
+            },
+            {
+                href: PROTECTED_ROUTES.SETTINGS,
+                label: "Settings",
+            },
+        ]
+        : [
+            {
+                href: PROTECTED_ROUTES.OVERVIEW,
+                label: "Overview",
+            },
+            {
+                href: PROTECTED_ROUTES.TRANSACTIONS,
+                label: "Transactions",
+            },
+            {
+                href: PROTECTED_ROUTES.REPORTS,
+                label: "Reports",
+            },
+            {
+                href: PROTECTED_ROUTES.SETTINGS,
+                label: "Settings",
+            },
+        ];
     return (_jsxs(_Fragment, { children: [_jsx("header", { className: cn("w-full px-4 py-3 pb-3 lg:px-14 bg-[var(--secondary-dark-color)] text-white ", pathname === PROTECTED_ROUTES.OVERVIEW && "!pb-3"), children: _jsx("div", { className: "w-full flex h-14 max-w-[var(--max-width)] items-center mx-auto", children: _jsxs("div", { className: "w-full flex items-center justify-between", children: [_jsxs("div", { className: "flex items-center gap-4", children: [_jsx(Button, { variant: "ghost", size: "icon", className: "inline-flex md:hidden !cursor-pointer\r\n               !bg-white/10 !text-white hover:bg-white/10", onClick: () => setIsOpen(true), children: _jsx(Menu, { className: "h-6 w-6" }) }), _jsx(Logo, {})] }), _jsx("nav", { className: "hidden md:flex items-center gap-x-2 overflow-x-auto", children: routes?.map((route) => (_jsx(Button, { size: "sm", variant: "ghost", className: cn(`w-full lg:w-auto font-normal py-4.5
                      hover:text-white border-none
                      text-white/60 focus:bg-white/30

@@ -12,17 +12,10 @@ import { PROTECTED_ROUTES } from "@/routes/common/routePath";
 const AdminPage = () => {
     const { user: currentUser } = useTypedSelector((state) => state.auth);
 
-    const isAdmin = currentUser?.role === "ADMIN";
-    const { data, isLoading, isError } = useAdminListUsersQuery(undefined, {
-        skip: !isAdmin,
-    });
+    const { data, isLoading, isError } = useAdminListUsersQuery();
     const [updateUserRole, { isLoading: isUpdatingRole }] = useAdminUpdateUserRoleMutation();
 
     const users = useMemo(() => data?.users ?? [], [data]);
-
-    if (!isAdmin) {
-        return <Navigate to={PROTECTED_ROUTES.OVERVIEW} replace />;
-    }
 
     const handleToggleRole = async (user) => {
         const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";

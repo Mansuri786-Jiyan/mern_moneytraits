@@ -36,7 +36,6 @@ export const reportInsightPrompt = ({ totalIncome, totalExpenses, availableBalan
     const categoryList = Object.entries(categories)
         .map(([name, { amount, percentage }]) => `- ${name}: ${amount} (${percentage}%)`)
         .join("\n");
-    console.log(categoryList, "category list");
     return `
   You are a friendly and smart financial coach, not a robot.
 

@@ -14,7 +14,7 @@ export const reportApi = apiClient.injectEndpoints({
         updateReportSetting: builder.mutation({
             query: (payload) => ({
                 url: "/report/update-setting",
-                method: "PUT",
+                method: "POST",
                 body: payload,
             }),
         }),

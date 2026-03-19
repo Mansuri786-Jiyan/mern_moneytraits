@@ -49,7 +49,6 @@ export const updateReportSettingService = async (userId, body) => {
             nextReportDate = currentNextReportDate;
         }
     }
-    console.log(nextReportDate, "nextReportDate");
     existingReportSetting.set({
         ...body,
         nextReportDate,
@@ -127,7 +126,6 @@ export const generateReportService = async (userId, fromDate, toDate) => {
         (results[0]?.totalIncome === 0 && results[0]?.totalExpenses === 0))
         return null;
     const { totalIncome = 0, totalExpenses = 0, categories = [], } = results[0] || {};
-    console.log(results[0], "results");
     const byCategory = categories.reduce((acc, { _id, total }) => {
         acc[_id] = {
             amount: convertToDollarUnit(total),

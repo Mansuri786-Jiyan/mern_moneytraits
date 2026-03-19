@@ -30,7 +30,6 @@ const SignUpForm = () => {
             navigate(AUTH_ROUTES.SIGN_IN);
         })
             .catch((error) => {
-            console.log(error);
             toast.error(error.data?.message || "Failed to sign up");
         });
     };

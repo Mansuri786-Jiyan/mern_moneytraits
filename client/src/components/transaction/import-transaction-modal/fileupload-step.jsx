@@ -31,7 +31,6 @@ const FileUploadStep = ({ onFileUpload }) => {
                 skipEmptyLines: true,
                 fastMode: true,
                 complete: (results) => {
-                    console.log(results, "results");
                     if (results.data.length > MAX_IMPORT_LIMIT) {
                         toast.error(`You can only import up to ${MAX_IMPORT_LIMIT} transactions.`);
                         resetProgress();
@@ -44,7 +43,6 @@ const FileUploadStep = ({ onFileUpload }) => {
                         sampleData: results.data[0]?.[name]?.slice(0, MAX_IMPORT_LIMIT) || "",
                     })) || [];
                     doneProgress();
-                    console.log(columns, results.data);
                     setTimeout(() => {
                         onFileUpload(file, columns, results.data);
                     }, 500);

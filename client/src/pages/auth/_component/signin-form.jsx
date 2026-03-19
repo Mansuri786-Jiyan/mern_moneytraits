@@ -40,7 +40,6 @@ const SignInForm = ({ className, ...props }) => {
             }, 1000);
         })
             .catch((error) => {
-            console.log(error);
             toast.error(error.data?.message || "Failed to login");
         });
     };

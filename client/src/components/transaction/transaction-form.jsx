@@ -107,7 +107,6 @@ const TransactionForm = (props) => {
     // Handle form submission
     const onSubmit = (values) => {
         // if (isCreating || isUpdating) return;
-        console.log("Form submitted:", values);
         const payload = {
             title: values.title,
             type: values.type,

@@ -35,7 +35,6 @@ export function AccountForm() {
         },
     });
     const onSubmit = (values) => {
-        console.log(values);
         if (isLoading)
             return;
         const formData = new FormData();

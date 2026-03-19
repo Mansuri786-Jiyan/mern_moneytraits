@@ -102,7 +102,6 @@ export const DateRangeSelect = ({ dateRange, setDateRange, defaultRange = DateRa
         if (!dateRange) {
             const defaultPreset = presets.find((p) => p.value === defaultRange);
             if (defaultPreset) {
-                // console.log(defaultPreset.getRange(),"defaultPreset.getRange()")
                 setDateRange(defaultPreset.getRange());
             }
         }

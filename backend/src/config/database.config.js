@@ -8,7 +8,6 @@ const connctDatabase = async () => {
             socketTimeoutMS: 45000,
             connectTimeoutMS: 30000,
         });
-        console.log("Connected to MongoDB database");
         return true;
     }
     catch (error) {
