@@ -2,22 +2,57 @@ import { apiClient } from "@/app/api-client";
 
 export const adminApi = apiClient.injectEndpoints({
     endpoints: (builder) => ({
-        adminListUsers: builder.query({
+        getAdminDashboard: builder.query({
             query: () => ({
-                url: "/user/admin/users",
+                url: "/admin/dashboard",
+                method: "GET",
+            }),
+            providesTags: ["admin-stats"],
+        }),
+        getAdminUsers: builder.query({
+            query: () => ({
+                url: "/admin/users",
                 method: "GET",
             }),
             providesTags: ["users"],
         }),
-        adminUpdateUserRole: builder.mutation({
-            query: ({ userId, role }) => ({
-                url: `/user/admin/users/${userId}/role`,
+        updateAdminUserRole: builder.mutation({
+            query: ({ id, role }) => ({
+                url: `/admin/users/${id}/role`,
                 method: "PATCH",
                 body: { role },
             }),
-            invalidatesTags: ["users"],
+            invalidatesTags: ["users", "admin-stats"],
+        }),
+        deleteAdminUser: builder.mutation({
+            query: (id) => ({
+                url: `/admin/users/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["users", "admin-stats"],
+        }),
+        getAdminTransactions: builder.query({
+            query: () => ({
+                url: "/admin/transactions",
+                method: "GET",
+            }),
+            providesTags: ["admin-transactions"],
+        }),
+        getAdminAnalytics: builder.query({
+            query: () => ({
+                url: "/admin/analytics",
+                method: "GET",
+            }),
+            providesTags: ["admin-stats"],
         }),
     }),
 });
 
-export const { useAdminListUsersQuery, useAdminUpdateUserRoleMutation } = adminApi;
+export const { 
+    useGetAdminDashboardQuery, 
+    useGetAdminUsersQuery, 
+    useUpdateAdminUserRoleMutation, 
+    useDeleteAdminUserMutation,
+    useGetAdminTransactionsQuery,
+    useGetAdminAnalyticsQuery
+} = adminApi;

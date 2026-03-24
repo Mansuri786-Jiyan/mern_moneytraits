@@ -8,12 +8,16 @@ import { errorHandler } from "./middlewares/errorHandler.middleware.js";
 import { asyncHandler } from "./middlewares/asyncHandler.middlerware.js";
 import connectDatabase from "./config/database.config.js";
 import authRoutes from "./routes/auth.route.js";
+import passwordResetRoutes from "./routes/password-reset.route.js";
 import { passportAuthenticateJwt } from "./config/passport.config.js";
 import userRoutes from "./routes/user.route.js";
 import transactionRoutes from "./routes/transaction.route.js";
 import { initializeCrons } from "./cron/index.js";
 import reportRoutes from "./routes/report.route.js";
 import analyticsRoutes from "./routes/analytics.route.js";
+import adminRoutes from "./routes/admin.route.js";
+
+import aiRoutes from "./routes/ai.route.js";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -42,10 +46,13 @@ app.get("/", asyncHandler(async (req, res, next) => {
 }));
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/auth`, passwordResetRoutes);
 app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
 app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 app.use(`${BASE_PATH}/report`, passportAuthenticateJwt, reportRoutes);
 app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
+app.use(`${BASE_PATH}/ai`, passportAuthenticateJwt, aiRoutes);
+app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 app.use(errorHandler);
 

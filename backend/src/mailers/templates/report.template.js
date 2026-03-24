@@ -4,13 +4,13 @@ import { capitalizeFirstLetter } from "../../utils/helper.js";
 export const getReportEmailTemplate = (reportData, frequency) => {
     const { username, period, totalIncome, totalExpenses, availableBalance, savingsRate, topSpendingCategories, insights, } = reportData;
     const reportTitle = `${capitalizeFirstLetter(frequency)} Report`;
-    const categoryList = topSpendingCategories
+    const categoryList = (topSpendingCategories || [])
         .map((cat) => `<li>
       ${cat.name} - ${formatCurrency(cat.amount)} (${cat.percent}%)
       </li>
     `)
         .join("");
-    const insightsList = insights
+    const insightsList = (insights || [])
         .map((insight) => `<li>${insight}</li>`)
         .join("");
     const currentYear = new Date().getFullYear();

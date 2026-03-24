@@ -1,7 +1,30 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Button } from "@/components/ui/button";
-import { Clock, RefreshCw } from "lucide-react";
+import { Clock, RefreshCw, Loader } from "lucide-react";
 import { _REPORT_STATUS } from "@/constant";
+import { useGenerateReportQuery } from "@/features/report/reportAPI";
+import { startOfMonth, endOfMonth, format } from "date-fns";
+import { toast } from "sonner";
+
+const ActionsCell = ({ row }) => {
+    const [generateReport, { isLoading }] = useGenerateReportQuery();
+    
+    const handleResend = async () => {
+        try {
+            const sentDate = new Date(row.original.sentDate);
+            const from = format(startOfMonth(sentDate), "yyyy-MM-dd");
+            const to = format(endOfMonth(sentDate), "yyyy-MM-dd");
+            
+            await generateReport({ from, to }).unwrap();
+            toast.success("Report resent successfully");
+        } catch (error) {
+            toast.error("Failed to resend report");
+        }
+    };
+
+    return (_jsxs("div", { className: "flex gap-1", children: [_jsxs(Button, { size: "sm", variant: "outline", className: "font-normal", onClick: handleResend, disabled: isLoading, children: [isLoading ? _jsx(Loader, { className: "h-4 w-4 animate-spin" }) : _jsx(RefreshCw, { className: "h-4 w-4" }), "Resend"] }), _jsx("div", {})] }));
+};
+
 export const reportColumns = [
     {
         accessorKey: "period",
@@ -44,7 +67,7 @@ export const reportColumns = [
         id: "actions",
         header: "Actions",
         size: 100,
-        cell: () => (_jsxs("div", { className: "flex gap-1", children: [_jsxs(Button, { size: "sm", variant: "outline", className: "font-normal", children: [_jsx(RefreshCw, { className: "h-4 w-4" }), "Resend"] }), _jsx("div", {})] })),
+        cell: ActionsCell,
     },
     {
         id: "-",

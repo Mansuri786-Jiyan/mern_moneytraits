@@ -178,14 +178,15 @@ async function generateInsightsAI({ totalIncome, totalExpenses, availableBalance
                 responseMimeType: "application/json",
             },
         });
-        const response = result.text;
+        const response = result.response.text();
         const cleanedText = response?.replace(/```(?:json)?\n?/g, "").trim();
         if (!cleanedText)
             return [];
         const data = JSON.parse(cleanedText);
-        return data;
+        return Array.isArray(data) ? data : [];
     }
     catch (error) {
+        console.error("Error generating insights with AI:", error);
         return [];
     }
 }

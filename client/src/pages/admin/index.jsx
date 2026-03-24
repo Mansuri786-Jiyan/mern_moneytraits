@@ -1,95 +1,68 @@
-import { useMemo } from "react";
-import { Navigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useTypedSelector } from "@/app/hook";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import PageLayout from "@/components/page-layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAdminListUsersQuery, useAdminUpdateUserRoleMutation } from "@/features/admin/adminAPI";
-import { PROTECTED_ROUTES } from "@/routes/common/routePath";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import AdminDashboard from "./_components/admin-dashboard";
+import AdminUsers from "./_components/admin-users";
+import AdminTransactions from "./_components/admin-transactions";
+import { LayoutDashboard, Users, ReceiptText } from "lucide-react";
 
+/**
+ * AdminPanel Component
+ * Unified management interface for administrators.
+ */
 const AdminPage = () => {
-    const { user: currentUser } = useTypedSelector((state) => state.auth);
-
-    const { data, isLoading, isError } = useAdminListUsersQuery();
-    const [updateUserRole, { isLoading: isUpdatingRole }] = useAdminUpdateUserRoleMutation();
-
-    const users = useMemo(() => data?.users ?? [], [data]);
-
-    const handleToggleRole = async (user) => {
-        const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";
-        try {
-            await updateUserRole({
-                userId: user._id,
-                role: nextRole,
-            }).unwrap();
-            toast.success(`Role updated to ${nextRole}`);
-        }
-        catch (error) {
-            toast.error(error?.data?.message || "Failed to update role");
-        }
-    };
-
     return (
         <PageLayout
-            title="Admin Panel"
-            subtitle="Manage users and roles"
+            title="Admin Control Center"
+            subtitle="Platform-wide management and analytics"
             addMarginTop
             showHeader
         >
-            <Card className="border shadow-none">
-                <CardContent className="pt-5">
-                    {isLoading ? (
-                        <p className="text-sm text-muted-foreground">Loading users...</p>
-                    ) : isError ? (
-                        <p className="text-sm text-red-500">Unable to load users</p>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Joined</TableHead>
-                                    <TableHead className="text-right">Action</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {users.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                            No users found
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    users.map((user) => {
-                                        const isCurrentUser = user._id === currentUser?._id;
-                                        return (
-                                            <TableRow key={user._id}>
-                                                <TableCell>{user.name}</TableCell>
-                                                <TableCell>{user.email}</TableCell>
-                                                <TableCell>{user.role}</TableCell>
-                                                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        disabled={isUpdatingRole || isCurrentUser}
-                                                        onClick={() => handleToggleRole(user)}
-                                                    >
-                                                        {user.role === "ADMIN" ? "Set as USER" : "Set as ADMIN"}
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                )}
-                            </TableBody>
-                        </Table>
-                    )}
-                </CardContent>
-            </Card>
+            <Tabs defaultValue="dashboard" className="w-full space-y-6">
+                <TabsList className="bg-muted/50 p-1 border">
+                    <TabsTrigger value="dashboard" className="gap-2 data-[state=active]:bg-background">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                    </TabsTrigger>
+                    <TabsTrigger value="users" className="gap-2 data-[state=active]:bg-background">
+                        <Users className="h-4 w-4" />
+                        User Management
+                    </TabsTrigger>
+                    <TabsTrigger value="transactions" className="gap-2 data-[state=active]:bg-background">
+                        <ReceiptText className="h-4 w-4" />
+                        All Transactions
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="dashboard" className="space-y-4">
+                    <AdminDashboard />
+                </TabsContent>
+
+                <TabsContent value="users">
+                    <Card className="border shadow-none">
+                        <CardHeader className="pb-3 border-b mb-0">
+                            <CardTitle className="text-xl">Users</CardTitle>
+                            <CardDescription>Manage user roles and platform access</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0 px-0">
+                            <AdminUsers />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="transactions">
+                    <Card className="border shadow-none">
+                        <CardHeader className="pb-3 border-b mb-0">
+                            <CardTitle className="text-xl">Transactions</CardTitle>
+                            <CardDescription>Overview of all financial activity on the platform</CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0 px-0">
+                            <AdminTransactions />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </PageLayout>
     );
 };

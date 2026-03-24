@@ -3,6 +3,7 @@ import authReducer from "../features/auth/authSlice.js";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from "redux-persist";
 import { apiClient } from "./api-client.js";
+
 const persistConfig = {
     key: "root", // Key for the persisted data in storage
     storage, // Storage engine to use (localStorage)

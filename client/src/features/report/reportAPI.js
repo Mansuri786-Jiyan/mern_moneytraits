@@ -18,6 +18,25 @@ export const reportApi = apiClient.injectEndpoints({
                 body: payload,
             }),
         }),
+        generateReport: builder.mutation({
+            query: ({ from, to }) => ({
+                url: "/report/generate",
+                method: "GET",
+                params: { from, to },
+            }),
+        }),
+        emailReport: builder.mutation({
+            query: ({ from, to }) => ({
+                url: "/report/email",
+                method: "POST",
+                body: { from, to },
+            })
+        }),
     }),
 });
-export const { useGetAllReportsQuery, useUpdateReportSettingMutation } = reportApi;
+export const { 
+    useGetAllReportsQuery, 
+    useUpdateReportSettingMutation,
+    useGenerateReportMutation: useGenerateReportQuery,
+    useEmailReportMutation 
+} = reportApi;

@@ -2,6 +2,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { AUTH_ROUTES, PROTECTED_ROUTES } from "./routePath.jsx";
 import SignIn from "@/pages/auth/sign-in";
 import SignUp from "@/pages/auth/sign-up";
+import ForgotPassword from "@/pages/auth/forgot-password";
 import Dashboard from "@/pages/dashboard";
 import Transactions from "@/pages/transactions";
 import Reports from "@/pages/reports";
@@ -13,6 +14,7 @@ import Billing from "@/pages/settings/billing";
 export const authenticationRoutePaths = [
     { path: AUTH_ROUTES.SIGN_IN, element: _jsx(SignIn, {}) },
     { path: AUTH_ROUTES.SIGN_UP, element: _jsx(SignUp, {}) },
+    { path: AUTH_ROUTES.FORGOT_PASSWORD, element: _jsx(ForgotPassword, {}) },
 ];
 export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}), userOnly: true },
