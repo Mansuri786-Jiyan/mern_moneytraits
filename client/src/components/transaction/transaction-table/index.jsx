@@ -3,7 +3,6 @@ import { DataTable } from "@/components/data-table";
 import { transactionColumns } from "./column.jsx";
 import { _TRANSACTION_TYPE } from "@/constant";
 import { useState } from "react";
-import useDebouncedSearch from "@/hooks/use-debounce-search";
 import { useBulkDeleteTransactionMutation, useGetAllTransactionsQuery, } from "@/features/transaction/transactionAPI";
 import { toast } from "sonner";
 const TransactionTable = (props) => {
@@ -13,12 +12,10 @@ const TransactionTable = (props) => {
         pageNumber: 1,
         pageSize: props.pageSize || 10,
     });
-    const { debouncedTerm, setSearchTerm } = useDebouncedSearch("", {
-        delay: 500,
-    });
+    const [keyword, setKeyword] = useState("");
     const [bulkDeleteTransaction, { isLoading: isBulkDeleting }] = useBulkDeleteTransactionMutation();
     const { data, isFetching } = useGetAllTransactionsQuery({
-        keyword: debouncedTerm,
+        keyword: keyword,
         type: filter.type,
         recurringStatus: filter.recurringStatus,
         pageNumber: filter.pageNumber,
@@ -32,7 +29,7 @@ const TransactionTable = (props) => {
         pageSize: filter.pageSize,
     };
     const handleSearch = (value) => {
-        setSearchTerm(value);
+        setKeyword(value);
     };
     const handleFilterChange = (filters) => {
         const { type, frequently } = filters;

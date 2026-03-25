@@ -71,6 +71,7 @@ export const emailReportController = asyncHandler(async (req, res) => {
         savingsRate: result.summary.savingsRate,
         topSpendingCategories: result.summary.topCategories,
         insights: result.insights,
+        transactions: result.transactions,
     };
 
     const emailTemplate = getReportEmailTemplate(reportData, "Custom Date Range");

@@ -5,6 +5,7 @@ import SignUp from "@/pages/auth/sign-up";
 import ForgotPassword from "@/pages/auth/forgot-password";
 import Dashboard from "@/pages/dashboard";
 import Transactions from "@/pages/transactions";
+import Budget from "@/pages/budget";
 import Reports from "@/pages/reports";
 import Admin from "@/pages/admin";
 import Settings from "@/pages/settings";
@@ -19,6 +20,7 @@ export const authenticationRoutePaths = [
 export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}), userOnly: true },
     { path: PROTECTED_ROUTES.TRANSACTIONS, element: _jsx(Transactions, {}), userOnly: true },
+    { path: PROTECTED_ROUTES.BUDGET, element: _jsx(Budget, {}), userOnly: true },
     { path: PROTECTED_ROUTES.REPORTS, element: _jsx(Reports, {}), userOnly: true },
     { path: PROTECTED_ROUTES.ADMIN, element: _jsx(Admin, {}), adminOnly: true },
     { path: PROTECTED_ROUTES.SETTINGS,

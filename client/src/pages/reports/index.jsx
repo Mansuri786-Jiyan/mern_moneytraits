@@ -56,19 +56,35 @@ export default function Reports() {
             return;
         }
         
-        // Fast CSV Generation client-side
-        const { summary } = reportData;
+        const { summary, transactions } = reportData;
         let csvContent = "data:text/csv;charset=utf-8,";
+        
+        // Summary Section
+        csvContent += "FINANCIAL SUMMARY\n";
         csvContent += "Metric,Value\n";
         csvContent += `Income,"${summary.income}"\n`;
         csvContent += `Expenses,"${summary.expenses}"\n`;
         csvContent += `Balance,"${summary.balance}"\n`;
-        csvContent += `Savings Rate,${summary.savingsRate}%\n`;
+        csvContent += `Savings Rate,${summary.savingsRate}%\n\n`;
         
-        csvContent += "\nCategory,Amount\n";
+        // Categories Section
+        csvContent += "TOP SPENDING CATEGORIES\n";
+        csvContent += "Category,Amount,Percentage\n";
         summary.topCategories?.forEach(cat => {
-            csvContent += `"${cat.name}","${cat.amount}"\n`;
+            csvContent += `"${cat.name}","${cat.amount}",${cat.percent}%\n`;
         });
+        csvContent += "\n";
+
+        // Transactions Section
+        if (transactions && transactions.length > 0) {
+            csvContent += "DETAILED TRANSACTIONS\n";
+            csvContent += "Date,Title,Amount,Type,Category,Description\n";
+            transactions.forEach(t => {
+                const date = new Date(t.date).toLocaleDateString();
+                const category = t.category?.name || t.category || "N/A";
+                csvContent += `${date},"${t.title}",${t.amount},${t.type},"${category}","${t.description || ""}"\n`;
+            });
+        }
 
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
@@ -78,7 +94,7 @@ export default function Reports() {
         link.click();
         document.body.removeChild(link);
         
-        toast.success("Report downloaded safely!");
+        toast.success("Detailed report downloaded!");
     };
 
     return (

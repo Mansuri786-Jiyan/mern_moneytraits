@@ -16,7 +16,8 @@ import { initializeCrons } from "./cron/index.js";
 import reportRoutes from "./routes/report.route.js";
 import analyticsRoutes from "./routes/analytics.route.js";
 import adminRoutes from "./routes/admin.route.js";
-
+import budgetRoutes from "./routes/budget.route.js";
+import goalRoutes from "./routes/goal.route.js";
 import aiRoutes from "./routes/ai.route.js";
 
 const app = express();
@@ -51,6 +52,8 @@ app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
 app.use(`${BASE_PATH}/transaction`, passportAuthenticateJwt, transactionRoutes);
 app.use(`${BASE_PATH}/report`, passportAuthenticateJwt, reportRoutes);
 app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
+app.use(`${BASE_PATH}/budget`, passportAuthenticateJwt, budgetRoutes);
+app.use(`${BASE_PATH}/goal`, passportAuthenticateJwt, goalRoutes);
 app.use(`${BASE_PATH}/ai`, passportAuthenticateJwt, aiRoutes);
 app.use(`${BASE_PATH}/admin`, adminRoutes);
 

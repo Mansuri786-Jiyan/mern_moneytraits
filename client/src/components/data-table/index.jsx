@@ -1,7 +1,7 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import * as React from "react";
 import { getCoreRowModel, getFilteredRowModel, getSortedRowModel, useReactTable, flexRender, } from "@tanstack/react-table";
-import { Loader, PlusCircleIcon, Trash, X } from "lucide-react";
+import { Download, Loader, PlusCircleIcon, Trash, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
@@ -36,10 +36,20 @@ export function DataTable({ data, columns, searchPlaceholder = "Search...", show
     });
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const hasSelections = selectedRows.length > 0;
+    const isFirstRun = React.useRef(true);
     const handleSearch = (value) => {
         setSearchTerm(value);
-        onSearch?.(value);
     };
+    React.useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            return;
+        }
+        const handler = setTimeout(() => {
+            onSearch?.(searchTerm);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm, onSearch]);
     const handleFilterChange = (key, value) => {
         const updated = { ...filterValues, [key]: value };
         setFilterValues(updated);

@@ -36,6 +36,10 @@ const Navbar = () => {
                 label: "Transactions",
             },
             {
+                href: PROTECTED_ROUTES.BUDGET,
+                label: "Budget",
+            },
+            {
                 href: PROTECTED_ROUTES.REPORTS,
                 label: "Reports",
             },

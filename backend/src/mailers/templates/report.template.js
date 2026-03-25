@@ -2,7 +2,7 @@ import { formatCurrency } from "../../utils/format-currency.js";
 import { capitalizeFirstLetter } from "../../utils/helper.js";
 
 export const getReportEmailTemplate = (reportData, frequency) => {
-    const { username, period, totalIncome, totalExpenses, availableBalance, savingsRate, topSpendingCategories, insights, } = reportData;
+    const { username, period, totalIncome, totalExpenses, availableBalance, savingsRate, topSpendingCategories, insights, transactions } = reportData;
     const reportTitle = `${capitalizeFirstLetter(frequency)} Report`;
     const categoryList = (topSpendingCategories || [])
         .map((cat) => `<li>
@@ -13,6 +13,17 @@ export const getReportEmailTemplate = (reportData, frequency) => {
     const insightsList = (insights || [])
         .map((insight) => `<li>${insight}</li>`)
         .join("");
+        
+    const transactionRows = (transactions || [])
+        .slice(0, 20) // Only show top 20 for brevity in email
+        .map((t) => `
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px;">${new Date(t.date).toLocaleDateString()}</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px;">${t.title}</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; text-align: right; color: ${t.type === 'EXPENSE' ? '#ef4444' : '#22c55e'}">${formatCurrency(t.amount)}</td>
+          </tr>
+        `).join("");
+        
     const currentYear = new Date().getFullYear();
     return `
   <!DOCTYPE html>
@@ -62,10 +73,26 @@ export const getReportEmailTemplate = (reportData, frequency) => {
                    ${categoryList}
                  </ul>
                  <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;" />
-                 <h4 style="margin: 0 0 10px; font-size: 16px;">Insights</h4>
-                 <ul style="padding-left: 20px; margin: 0; font-size: 16px;">
-                   ${insightsList}
-                 </ul>
+                  <h4 style="margin: 0 0 10px; font-size: 16px;">Insights</h4>
+                  <ul style="padding-left: 20px; margin: 0; font-size: 16px;">
+                    ${insightsList}
+                  </ul>
+                  ${transactionRows ? `
+                  <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;" />
+                  <h4 style="margin: 0 0 10px; font-size: 16px;">Recent Transactions (Top 20)</h4>
+                  <table width="100%" style="border-collapse: collapse;">
+                    <thead>
+                      <tr>
+                        <th style="text-align: left; padding-bottom: 8px; font-size: 14px; color: #666;">Date</th>
+                        <th style="text-align: left; padding-bottom: 8px; font-size: 14px; color: #666;">Title</th>
+                        <th style="text-align: right; padding-bottom: 8px; font-size: 14px; color: #666;">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${transactionRows}
+                    </tbody>
+                  </table>
+                  ` : ""}
                  <p style="margin-top: 30px; font-size: 13px; color: #888;">This report was generated automatically based on your recent activity.</p>
                </td>
              </tr>

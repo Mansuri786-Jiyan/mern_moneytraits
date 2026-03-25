@@ -10,6 +10,7 @@ export const AUTH_ROUTES = {
 export const PROTECTED_ROUTES = {
     OVERVIEW: "/overview",
     TRANSACTIONS: "/transactions",
+    BUDGET: "/budget",
     REPORTS: "/reports",
     ADMIN: "/admin",
     SETTINGS: "/settings",

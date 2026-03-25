@@ -108,6 +108,11 @@ export const generateReportService = async (userId, fromDate, toDate) => {
                         $limit: 5,
                     },
                 ],
+                transactions: [
+                    {
+                        $sort: { date: -1 },
+                    },
+                ],
             },
         },
         {
@@ -119,13 +124,14 @@ export const generateReportService = async (userId, fromDate, toDate) => {
                     $arrayElemAt: ["$summary.totalExpenses", 0],
                 },
                 categories: 1,
+                transactions: 1,
             },
         },
     ]);
     if (!results?.length ||
         (results[0]?.totalIncome === 0 && results[0]?.totalExpenses === 0))
         return null;
-    const { totalIncome = 0, totalExpenses = 0, categories = [], } = results[0] || {};
+    const { totalIncome = 0, totalExpenses = 0, categories = [], transactions = [] } = results[0] || {};
     const byCategory = categories.reduce((acc, { _id, total }) => {
         acc[_id] = {
             amount: convertToDollarUnit(total),
