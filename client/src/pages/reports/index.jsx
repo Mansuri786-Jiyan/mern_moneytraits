@@ -109,6 +109,13 @@ export default function Reports() {
             }
         >
             <div className="space-y-6">
+                <ScheduleReportDrawer 
+                    open={isDrawerOpen} 
+                    onOpenChange={setIsDrawerOpen} 
+                    trigger={
+                        <Button variant="outline"><CalendarDays className="mr-2 h-4 w-4"/> Report Settings</Button>
+                    }
+                />
                 
                 {/* Generate Report Section */}
                 <Card className="border shadow-none">
@@ -234,7 +241,6 @@ export default function Reports() {
                         </CardContent>
                     </Card>
                 )}
-                <ScheduleReportDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
             </div>
         </PageLayout>
     );
