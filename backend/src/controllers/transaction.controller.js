@@ -2,6 +2,7 @@ import { asyncHandler } from "../middlewares/asyncHandler.middlerware.js";
 import { HTTPSTATUS } from "../config/http.config.js";
 import { createTransactionSchema, transactionIdSchema, updateTransactionSchema, bulkDeleteTransactionSchema, bulkTransactionSchema } from "../validators/transaction.validator.js";
 import { createTransactionService, getAllTransactionService, getTransactionByIdService, duplicateTransactionService, updateTransactionService, deleteTransactionService, bulkDeleteTransactionService, bulkTransactionService, scanReceiptService } from "../services/transaction.service.js";
+import TransactionModel from "../models/transaction.model.js";
 
 export const createTransactionController = asyncHandler(async (req, res) => {
     const body = createTransactionSchema.parse(req.body);
@@ -24,7 +25,9 @@ export const getAllTransactionController = asyncHandler(async (req, res) => {
         pageSize: parseInt(req.query.pageSize) || 20,
         pageNumber: parseInt(req.query.pageNumber) || 1,
     };
+    console.log("Transaction Debug: Fetching transactions for userId:", userId, "filters:", filters);
     const result = await getAllTransactionService(userId, filters, pagination);
+    console.log("Transaction Debug: Result count:", result.pagination?.totalCount);
     return res.status(HTTPSTATUS.OK).json({
         message: "Transaction fetched successfully",
         ...result,
@@ -96,5 +99,47 @@ export const scanReceiptController = asyncHandler(async (req, res) => {
     return res.status(HTTPSTATUS.OK).json({
         message: "Reciept scanned successfully",
         data: result,
+    });
+});
+
+export const getAllTransactionsForExportController = asyncHandler(async (req, res) => {
+    const userId = req.user?._id;
+    const filters = {
+        keyword: req.query.keyword,
+        type: req.query.type,
+        recurringStatus: req.query.recurringStatus,
+    };
+    
+    const filterConditions = {
+        userId,
+    };
+    
+    if (filters.keyword) {
+        filterConditions.$or = [
+            { title: { $regex: filters.keyword, $options: "i" } },
+            { category: { $regex: filters.keyword, $options: "i" } },
+        ];
+    }
+    
+    if (filters.type) {
+        filterConditions.type = filters.type;
+    }
+    
+    if (filters.recurringStatus) {
+        if (filters.recurringStatus === "RECURRING") {
+            filterConditions.isRecurring = true;
+        } else if (filters.recurringStatus === "NON_RECURRING") {
+            filterConditions.isRecurring = false;
+        }
+    }
+
+    const transactions = await TransactionModel.find(filterConditions).sort({ date: -1 });
+    
+    return res.status(HTTPSTATUS.OK).json({
+        message: "All transactions fetched for export",
+        data: {
+            transactions,
+            totalCount: transactions.length
+        }
     });
 });

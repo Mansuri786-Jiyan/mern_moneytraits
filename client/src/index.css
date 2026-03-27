@@ -140,3 +140,17 @@ body {
 --chart-3: oklch(0.48 0.19 148.6);
 --chart-4: oklch(0.28 0.11 145.8);
 --chart-5: oklch(0.18 0.08 147.0); */
+
+@media print {
+  nav, header, aside, .no-print, [role="navigation"], button:not(.print-only) { display: none !important; }
+  .print-area { display: block !important; }
+  body { background: white !important; margin: 0 !important; padding: 0 !important; color: black !important; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ddd !important; padding: 8px !important; font-size: 11px !important; text-align: left; }
+  th { background: #f5f5f5 !important; font-weight: 600 !important; color: black !important; }
+  tr:nth-child(even) { background: #fafafa !important; }
+  .card { box-shadow: none !important; border: 1px solid #eee !important; margin-bottom: 20px; }
+  .text-white { color: black !important; }
+  .bg-white\/5 { background: transparent !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}

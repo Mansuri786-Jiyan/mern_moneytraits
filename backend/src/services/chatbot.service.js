@@ -92,35 +92,57 @@ ${transactionsString}
 
 export const chatbotService = async (userId, message, conversationHistory = []) => {
   try {
+    // 0. Quick validation of userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error(`Invalid User ID: ${userId}`);
+    }
+
     const financialContext = await getChatContext(userId);
     const systemMessage = getChatbotSystemPrompt(financialContext);
 
-    // Limit history to last 10 messages
+    // 1. Build contents array with alternating roles
+    // Gemini REQUIRES alternating user/model/user roles.
+    const contents = [];
+
+    // The first message will contain our system prompt + the first historical message (or current message)
     const history = conversationHistory.slice(-10);
+    
+    // Initial message from user (augmented with system context)
+    const firstUserText = history.length > 0 ? history[0].content : message;
+    contents.push({
+      role: "user",
+      parts: [{ text: `${systemMessage}\n\nClient Initial Request: ${firstUserText}` }]
+    });
 
-    // Build Gemini contents array
-    // First message must be "user" or "system" (if supported). 
-    // Here we wrap the system context into the first user message or a specialized system instruction.
-    // The user requested: role is "user" or "model"
+    // Add subsequent history, alternating roles
+    for (let i = 1; i < history.length; i++) {
+      const msg = history[i];
+      const role = msg.role === "user" ? "user" : "model";
+      
+      // Safety: Prevent consecutive identical roles
+      const lastRole = contents[contents.length - 1].role;
+      if (role === lastRole) {
+        // If consecutive same role, combine them into one message if possible, or skip
+        contents[contents.length - 1].parts[0].text += "\n" + msg.content;
+      } else {
+        contents.push({
+          role,
+          parts: [{ text: msg.content }],
+        });
+      }
+    }
 
-    const contents = [
-      {
-        role: "user",
-        parts: [{ text: systemMessage + "\n\nUser: " + (history[0]?.content || message) }],
-      },
-      ...history.slice(1).map((m) => ({
-        role: m.role === "user" ? "user" : "model",
-        parts: [{ text: m.content }],
-      })),
-    ];
-
-    // If history was empty, the first message already contains the current 'message'.
-    // If history was not empty, we need to add the current 'message' at the end.
+    // Add current message IF it wasn't the very first one we used above
     if (history.length > 0) {
-      contents.push({
-        role: "user",
-        parts: [{ text: message }],
-      });
+      const lastRole = contents[contents.length - 1].role;
+      if (lastRole === "user") {
+        contents[contents.length - 1].parts[0].text += "\n" + message;
+      } else {
+        contents.push({
+          role: "user",
+          parts: [{ text: message }],
+        });
+      }
     }
 
     const result = await genAI.models.generateContent({
@@ -128,12 +150,18 @@ export const chatbotService = async (userId, message, conversationHistory = []) 
       contents,
       config: {
         temperature: 0.7,
-        maxOutputTokens: 300,
+        maxOutputTokens: 400,
       },
     });
 
+    // 2. Defensive extraction (mirroring report.service.js)
+    const reply = result?.text || 
+                  result?.response?.text?.() || 
+                  result?.candidates?.[0]?.content?.parts?.[0]?.text || 
+                  "I could not process that. Please try again.";
+
     return {
-      reply: result.response.text()?.trim() || "I could not process that. Please try again.",
+      reply: reply.trim(),
     };
   } catch (error) {
     console.error("Chatbot Service Error:", error);

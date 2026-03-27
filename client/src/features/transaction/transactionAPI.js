@@ -62,6 +62,13 @@ export const transactionApi = apiClient.injectEndpoints({
             }),
             invalidatesTags: ["transactions"],
         }),
+        getAllTransactionsForExport: builder.query({
+            query: ({ keyword, type, recurringStatus } = {}) => ({
+                url: "/transaction/export-all",
+                method: "GET",
+                params: { keyword, type, recurringStatus },
+            }),
+        }),
         deleteTransaction: builder.mutation({
             query: (id) => ({
                 url: `/transaction/delete/${id}`,
@@ -88,4 +95,4 @@ export const transactionApi = apiClient.injectEndpoints({
         }),
     }),
 });
-export const { useCreateTransactionMutation, useGetAllTransactionsQuery, useAiScanReceiptMutation, useGetSingleTransactionQuery, useDuplicateTransactionMutation, useUpdateTransactionMutation, useBulkImportTransactionMutation, useDeleteTransactionMutation, useBulkDeleteTransactionMutation, useSuggestCategoryMutation, } = transactionApi;
+export const { useCreateTransactionMutation, useGetAllTransactionsQuery, useGetAllTransactionsForExportQuery, useAiScanReceiptMutation, useGetSingleTransactionQuery, useDuplicateTransactionMutation, useUpdateTransactionMutation, useBulkImportTransactionMutation, useDeleteTransactionMutation, useBulkDeleteTransactionMutation, useSuggestCategoryMutation, } = transactionApi;

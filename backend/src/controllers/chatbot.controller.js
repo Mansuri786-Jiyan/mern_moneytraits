@@ -12,6 +12,12 @@ export const chatbotController = asyncHandler(async (req, res) => {
     });
   }
 
+  if (!userId) {
+    return res.status(HTTPSTATUS.UNAUTHORIZED).json({
+      message: "Unauthorized. Please log in to use the chatbot.",
+    });
+  }
+
   const result = await chatbotService(userId, message.trim(), conversationHistory);
 
   return res.status(HTTPSTATUS.OK).json({

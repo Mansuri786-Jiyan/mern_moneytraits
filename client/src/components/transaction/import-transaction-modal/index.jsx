@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useState } from "react";
-import { Dialog, DialogContent, } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ImportIcon } from "lucide-react";
 import FileUploadStep from "./fileupload-step.jsx";
@@ -58,7 +58,6 @@ const ImportTransactionModal = () => {
                 return null;
         }
     };
-    return (_jsxs(Dialog, { open: open, onOpenChange: handleClose, children: [_jsxs(Button, { variant: "outline", className: "!shadow-none !cursor-pointer !border-gray-500\r\n       !text-white !bg-transparent", onClick: () => setOpen(true), children: [_jsx(ImportIcon, { className: "!w-5 !h-5" }), "Bulk Import"] }), _jsx(DialogContent, { className: "max-w-2xl min-h-[40vh]", children: renderStep() })] }));
+    return (_jsxs(Dialog, { open: open, onOpenChange: handleClose, children: [_jsxs(Button, { variant: "outline", className: "!shadow-none !cursor-pointer !border-gray-500\r\n       !text-white !bg-transparent", onClick: () => setOpen(true), children: [_jsx(ImportIcon, { className: "!w-5 !h-5" }), "Bulk Import"] }), _jsxs(DialogContent, { className: "max-w-2xl min-h-[40vh]", children: [_jsxs(DialogHeader, { children: [_jsx(DialogTitle, { children: "Import Transactions" }), _jsx(DialogDescription, { children: "Upload a CSV file and map its columns to your transaction fields." })] }), renderStep()] })] }));
 };
 export default ImportTransactionModal;
-

@@ -22,7 +22,15 @@ export const transactionColumns = [
     {
         accessorKey: "createdAt",
         header: ({ column }) => (_jsxs(Button, { variant: "ghost", onClick: () => column.toggleSorting(column.getIsSorted() === "asc"), children: ["Date Created", _jsx(ArrowUpDown, { className: "ml-2 h-4 w-4" })] })),
-        cell: ({ row }) => format(row.getValue("createdAt"), "MMM dd, yyyy"),
+        cell: ({ row }) => {
+            const date = row.getValue("createdAt");
+            if (!date) return "N/A";
+            try {
+                return format(new Date(date), "MMM dd, yyyy");
+            } catch (e) {
+                return "Invalid Date";
+            }
+        },
     },
     {
         accessorKey: "title",
@@ -60,7 +68,15 @@ export const transactionColumns = [
     {
         accessorKey: "date",
         header: ({ column }) => (_jsxs(Button, { variant: "ghost", onClick: () => column.toggleSorting(column.getIsSorted() === "asc"), children: ["Transaction Date", _jsx(ArrowUpDown, { className: "ml-2 h-4 w-4" })] })),
-        cell: ({ row }) => format(row.original.date, "MMM dd, yyyy"),
+        cell: ({ row }) => {
+            const date = row.original?.date;
+            if (!date) return "N/A";
+            try {
+                return format(new Date(date), "MMM dd, yyyy");
+            } catch (e) {
+                return "Invalid Date";
+            }
+        },
     },
     {
         accessorKey: "paymentMethod",
