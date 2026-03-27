@@ -25,6 +25,13 @@ export const analyticsApi = apiClient.injectEndpoints({
             }),
             providesTags: ["analytics"],
         }),
+        getForecast: builder.query({
+            query: () => ({
+                url: "/forecast/generate",
+                method: "GET",
+            }),
+            providesTags: ["forecast"],
+        }),
     }),
 });
-export const { useSummaryAnalyticsQuery, useChartAnalyticsQuery, useExpensePieChartBreakdownQuery, } = analyticsApi;
+export const { useSummaryAnalyticsQuery, useChartAnalyticsQuery, useExpensePieChartBreakdownQuery, useGetForecastQuery, } = analyticsApi;

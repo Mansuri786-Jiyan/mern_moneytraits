@@ -19,6 +19,9 @@ import adminRoutes from "./routes/admin.route.js";
 import budgetRoutes from "./routes/budget.route.js";
 import goalRoutes from "./routes/goal.route.js";
 import aiRoutes from "./routes/ai.route.js";
+import categorizeRoutes from "./routes/categorize.route.js";
+import forecastRoutes from "./routes/forecast.route.js";
+import chatbotRoutes from "./routes/chatbot.route.js";
 
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
@@ -55,6 +58,8 @@ app.use(`${BASE_PATH}/analytics`, passportAuthenticateJwt, analyticsRoutes);
 app.use(`${BASE_PATH}/budget`, passportAuthenticateJwt, budgetRoutes);
 app.use(`${BASE_PATH}/goal`, passportAuthenticateJwt, goalRoutes);
 app.use(`${BASE_PATH}/ai`, passportAuthenticateJwt, aiRoutes);
+app.use(`${BASE_PATH}/categorize`, passportAuthenticateJwt, categorizeRoutes);
+app.use(`${BASE_PATH}/forecast`, passportAuthenticateJwt, forecastRoutes);
 app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 app.use(errorHandler);

@@ -79,6 +79,13 @@ export const transactionApi = apiClient.injectEndpoints({
             }),
             invalidatesTags: ["transactions", "analytics"],
         }),
+        suggestCategory: builder.mutation({
+            query: (body) => ({
+                url: "/categorize/suggest",
+                method: "POST",
+                body,
+            }),
+        }),
     }),
 });
-export const { useCreateTransactionMutation, useGetAllTransactionsQuery, useAiScanReceiptMutation, useGetSingleTransactionQuery, useDuplicateTransactionMutation, useUpdateTransactionMutation, useBulkImportTransactionMutation, useDeleteTransactionMutation, useBulkDeleteTransactionMutation, } = transactionApi;
+export const { useCreateTransactionMutation, useGetAllTransactionsQuery, useAiScanReceiptMutation, useGetSingleTransactionQuery, useDuplicateTransactionMutation, useUpdateTransactionMutation, useBulkImportTransactionMutation, useDeleteTransactionMutation, useBulkDeleteTransactionMutation, useSuggestCategoryMutation, } = transactionApi;
