@@ -177,22 +177,40 @@ async function generateInsightsAI({ totalIncome, totalExpenses, availableBalance
             categories,
             periodLabel,
         });
-        const result = await genAI.getGenerativeModel({ model: genAIModel }).generateContent({
+
+        // 1. Call Gemini using existing genAI and genAIModel
+        const result = await genAI.models.generateContent({
+            model: genAIModel,
             contents: [{ role: "user", parts: [{ text: prompt }] }],
-            generationConfig: {
-                responseMimeType: "application/json",
+            config: {
+                temperature: 0.4,
             },
         });
-        const response = result.response.text();
-        const cleanedText = response?.replace(/```(?:json)?\n?/g, "").trim();
-        if (!cleanedText)
-            return [];
-        const data = JSON.parse(cleanedText);
-        return Array.isArray(data) ? data : [];
+
+        // 2. Safely extract response text using multiple fallback paths
+        const text = result?.text || 
+                     result?.response?.text?.() || 
+                     result?.candidates?.[0]?.content?.parts?.[0]?.text || 
+                     "";
+
+        // 3. Fallback handling if no text exists
+        if (!text || text.trim().length < 5) {
+            return ["Unable to generate insights at the moment"];
+        }
+
+        // 4. Parse output into array: split by newline + remove bullets
+        const insights = text
+            .split("\n")
+            .map(line => line.replace(/^[•\s*-]+/, "").trim())
+            .filter(Boolean)
+            .filter(line => line.length > 5);
+
+        return insights.length > 0 ? insights.slice(0, 5) : ["Unable to generate insights at the moment"];
     }
     catch (error) {
-        console.error("Error generating insights with AI:", error);
-        return [];
+        // 5. Catch error, log it, and return safe fallback
+        console.error("AI Insights Generation Error:", error);
+        return ["AI insights unavailable"];
     }
 }
 function calculateSavingRate(totalIncome, totalExpenses) {

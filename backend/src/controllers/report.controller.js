@@ -140,6 +140,12 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
     }
 
     try {
+        console.log("Sending report email with data:", {
+            email: user.email,
+            username: user.name,
+            period: result.period,
+        });
+
         await sendReportEmail({
             email: user.email,
             username: user.name,
@@ -151,8 +157,9 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
                 savingsRate: result.summary.savingsRate,
                 topSpendingCategories: result.summary.topCategories,
                 insights: result.insights,
+                transactions: result.transactions || [],
             },
-            frequency: "custom",
+            frequency: "Custom",
         });
 
         await ReportModel.create({
@@ -163,12 +170,12 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
         });
 
         return res.status(HTTPSTATUS.OK).json({
-            message: "Report sent to your email successfully",
+            message: `Report sent to ${user.email} successfully`,
         });
     } catch (error) {
         console.error("Error sending report now:", error);
         return res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
-            message: "Failed to send report email",
+            message: error.message || "Failed to send report email",
         });
     }
 });

@@ -18,10 +18,11 @@ Summary:
 Top Spending Categories:
 ${JSON.stringify(data.categories, null, 2)}
 
-Provide 3-5 key insights or recommendations as a JSON array of strings.
-Example: ["You saved 20% more than last month, keep it up!", "Dining out is your top expense at 30% of your budget. Consider cooking at home."]
-
-Respond ONLY with the JSON array.
+Provide 3-5 short, actionable key insights or recommendations as bullet points starting with "• ".
+Do NOT include any other text or formatting. 
+Example:
+• You saved 20% more than last month, keep it up!
+• Dining out is your top expense. Consider cooking at home.
 `;
 
 export const receiptPrompt = `

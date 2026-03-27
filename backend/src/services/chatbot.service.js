@@ -123,9 +123,10 @@ export const chatbotService = async (userId, message, conversationHistory = []) 
       });
     }
 
-    const result = await genAI.getGenerativeModel({ model: genAIModel }).generateContent({
+    const result = await genAI.models.generateContent({
+      model: genAIModel,
       contents,
-      generationConfig: {
+      config: {
         temperature: 0.7,
         maxOutputTokens: 300,
       },

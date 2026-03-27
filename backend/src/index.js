@@ -60,6 +60,7 @@ app.use(`${BASE_PATH}/goal`, passportAuthenticateJwt, goalRoutes);
 app.use(`${BASE_PATH}/ai`, passportAuthenticateJwt, aiRoutes);
 app.use(`${BASE_PATH}/categorize`, passportAuthenticateJwt, categorizeRoutes);
 app.use(`${BASE_PATH}/forecast`, passportAuthenticateJwt, forecastRoutes);
+app.use(`${BASE_PATH}/chatbot`, passportAuthenticateJwt, chatbotRoutes);
 app.use(`${BASE_PATH}/admin`, adminRoutes);
 
 app.use(errorHandler);
