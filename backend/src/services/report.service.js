@@ -177,10 +177,9 @@ async function generateInsightsAI({ totalIncome, totalExpenses, availableBalance
             categories,
             periodLabel,
         });
-        const result = await genAI.models.generateContent({
-            model: genAIModel,
-            contents: [createUserContent([prompt])],
-            config: {
+        const result = await genAI.getGenerativeModel({ model: genAIModel }).generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
                 responseMimeType: "application/json",
             },
         });

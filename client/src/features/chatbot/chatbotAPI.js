@@ -1,6 +1,6 @@
-import { api } from "../../app/api-client";
+import { apiClient } from "@/app/api-client";
 
-export const chatbotAPI = api.injectEndpoints({
+export const chatbotAPI = apiClient.injectEndpoints({
   endpoints: (builder) => ({
     sendChatMessage: builder.mutation({
       query: (body) => ({
