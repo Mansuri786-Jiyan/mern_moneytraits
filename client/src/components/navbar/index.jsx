@@ -40,8 +40,8 @@ const Navbar = () => {
                 label: "Budget",
             },
             {
-                href: PROTECTED_ROUTES.REPORTS,
-                label: "Reports",
+                href: PROTECTED_ROUTES.AI_INSIGHTS,
+                label: "AI Insights",
             },
             {
                 href: PROTECTED_ROUTES.SETTINGS,

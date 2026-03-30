@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import Navbar from "@/components/navbar";
 import EditTransactionDrawer from "@/components/transaction/edit-transaction-drawer";
 import AiAdvisor from "@/components/ai-advisor";
-import ChatBot from "@/components/chatbot";
 
 const AppLayout = () => {
     return (_jsxs(_Fragment, { children: [
@@ -18,8 +17,7 @@ const AppLayout = () => {
             ] 
         }), 
         _jsx(EditTransactionDrawer, {}), 
-        _jsx(AiAdvisor, {}), 
-        _jsx(ChatBot, {})
+        _jsx(AiAdvisor, {})
     ] }));
 };
 export default AppLayout;

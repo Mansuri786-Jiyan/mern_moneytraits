@@ -6,7 +6,8 @@ import ForgotPassword from "@/pages/auth/forgot-password";
 import Dashboard from "@/pages/dashboard";
 import Transactions from "@/pages/transactions";
 import Budget from "@/pages/budget";
-import Reports from "@/pages/reports";
+import AIInsights from "@/pages/ai-insights";
+// import Reports from "@/pages/reports";
 import Admin from "@/pages/admin";
 import Settings from "@/pages/settings";
 import Account from "@/pages/settings/account";
@@ -21,7 +22,8 @@ export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}), userOnly: true },
     { path: PROTECTED_ROUTES.TRANSACTIONS, element: _jsx(Transactions, {}), userOnly: true },
     { path: PROTECTED_ROUTES.BUDGET, element: _jsx(Budget, {}), userOnly: true },
-    { path: PROTECTED_ROUTES.REPORTS, element: _jsx(Reports, {}), userOnly: true },
+    { path: PROTECTED_ROUTES.AI_INSIGHTS, element: _jsx(AIInsights, {}), userOnly: true },
+    // { path: PROTECTED_ROUTES.REPORTS, element: <Reports />, userOnly: true },
     { path: PROTECTED_ROUTES.ADMIN, element: _jsx(Admin, {}), adminOnly: true },
     { path: PROTECTED_ROUTES.SETTINGS,
         element: _jsx(Settings, {}),

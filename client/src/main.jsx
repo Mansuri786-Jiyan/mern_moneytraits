@@ -9,4 +9,5 @@ import { Provider } from "react-redux";
 import { store } from "./app/store.js";
 import { persistor } from "./app/store.js";
 import { PersistGate } from "redux-persist/integration/react";
+console.log("--- MAIN.JSX STARTING ---");
 createRoot(document.getElementById("root")).render(_jsx(StrictMode, { children: _jsx(Provider, { store: store, children: _jsxs(PersistGate, { loading: null, persistor: persistor, children: [_jsx(NuqsAdapter, { children: _jsx(App, {}) }), _jsx(Toaster, { position: "top-center", expand: true, duration: 5000, richColors: true, closeButton: true })] }) }) }));
