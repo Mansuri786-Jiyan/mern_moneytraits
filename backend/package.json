@@ -9,6 +9,7 @@
     "dev:legacy": "node --watch server.js",
     "start:legacy": "node server.js"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
