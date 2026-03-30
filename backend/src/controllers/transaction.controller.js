@@ -25,9 +25,7 @@ export const getAllTransactionController = asyncHandler(async (req, res) => {
         pageSize: parseInt(req.query.pageSize) || 20,
         pageNumber: parseInt(req.query.pageNumber) || 1,
     };
-    console.log("Transaction Debug: Fetching transactions for userId:", userId, "filters:", filters);
     const result = await getAllTransactionService(userId, filters, pagination);
-    console.log("Transaction Debug: Result count:", result.pagination?.totalCount);
     return res.status(HTTPSTATUS.OK).json({
         message: "Transaction fetched successfully",
         ...result,

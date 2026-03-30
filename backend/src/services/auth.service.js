@@ -1,33 +1,33 @@
 import UserModel from "../models/user.model.js";
 import { BadRequestException, UnauthorizedException, NotFoundException } from "../utils/app-error.js";
 import ReportSettingModel, { ReportFrequencyEnum } from "../models/report-setting.model.js";
+import PasswordResetTokenModel from "../models/password-reset-token.model.js";
 import { calulateNextReportDate } from "../utils/helper.js";
 import { signJwtToken } from "../utils/jwt.js";
+import { sendEmailVerificationOtp } from "../mailers/email-verification.mailer.js";
 import jwt from "jsonwebtoken";
 import { Env } from "../config/env.config.js";
 
 export const registerService = async (body) => {
-    const { name, email, password, role } = body;
+    const { name, email, password } = body;
 
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
         throw new UnauthorizedException("User already exists");
     }
 
-    let roleToAssign = "USER";
-    if (role === "ADMIN") {
-        roleToAssign = "ADMIN";
-    }
-
+    // Always assign USER role — admin accounts are seeded manually only
     const newUser = new UserModel({
         name,
         email,
         password,
-        role: roleToAssign,
+        role: "USER",
+        isEmailVerified: false,
     });
 
     await newUser.save();
 
+    // Create report settings for the new user
     const reportSetting = new ReportSettingModel({
         userId: newUser._id,
         frequency: ReportFrequencyEnum.MONTHLY,
@@ -35,8 +35,23 @@ export const registerService = async (body) => {
         nextReportDate: calulateNextReportDate(),
         lastSentDate: null,
     });
-
     await reportSetting.save();
+
+    // Generate 6-digit OTP and store it (reusing PasswordResetToken model)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await PasswordResetTokenModel.deleteMany({ userId: newUser._id, used: false });
+    await PasswordResetTokenModel.create({
+        userId: newUser._id,
+        token: otp,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+    });
+
+    // Send verification email
+    await sendEmailVerificationOtp({
+        email: newUser.email,
+        username: newUser.name,
+        otp,
+    });
 
     return { user: newUser.omitPassword() };
 };
@@ -51,6 +66,12 @@ export const loginService = async (body) => {
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid)
         throw new UnauthorizedException("Invalid email/password");
+
+    // Block login if email is not verified
+    if (!user.isEmailVerified) {
+        throw new UnauthorizedException("Please verify your email before logging in. Check your inbox for the OTP.");
+    }
+
     const { token, expiresAt } = signJwtToken({ userId: user.id });
     const reportSetting = await ReportSettingModel.findOne({
         userId: user.id,
@@ -63,12 +84,43 @@ export const loginService = async (body) => {
     };
 };
 
+export const verifyEmailService = async (email, otp) => {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+        throw new NotFoundException("User not found");
+    }
+
+    if (user.isEmailVerified) {
+        throw new BadRequestException("Email is already verified");
+    }
+
+    const token = await PasswordResetTokenModel.findOne({
+        userId: user._id,
+        token: otp,
+        used: false,
+        expiresAt: { $gt: new Date() },
+    });
+
+    if (!token) {
+        throw new BadRequestException("Invalid or expired OTP");
+    }
+
+    // Mark email as verified
+    user.isEmailVerified = true;
+    await user.save();
+
+    // Mark OTP as used
+    token.used = true;
+    await token.save();
+
+    return { message: "Email verified successfully. You can now log in." };
+};
+
 export const refreshTokenService = async (accessToken) => {
     if (!accessToken) {
         throw new UnauthorizedException("No token provided");
     }
 
-    // Decode the token (even if expired) to get the userId
     let decoded;
     try {
         decoded = jwt.verify(accessToken, Env.JWT_SECRET, {
@@ -87,7 +139,6 @@ export const refreshTokenService = async (accessToken) => {
         throw new UnauthorizedException("User not found");
     }
 
-    // Issue a new access token
     const { token, expiresAt } = signJwtToken({ userId: user.id });
     return {
         accessToken: token,

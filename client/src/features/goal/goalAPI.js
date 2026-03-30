@@ -1,6 +1,6 @@
-import { apiSlice } from "../../app/api/api-slice";
+import { apiClient } from "@/app/api-client";
 
-export const goalAPI = apiSlice.injectEndpoints({
+export const goalAPI = apiClient.injectEndpoints({
   endpoints: (builder) => ({
     getAllGoals: builder.query({
       query: () => "/goal/all",

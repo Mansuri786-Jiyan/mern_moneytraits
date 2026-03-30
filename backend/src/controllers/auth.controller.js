@@ -1,7 +1,7 @@
 import { HTTPSTATUS } from "../config/http.config.js";
 import { asyncHandler } from "../middlewares/asyncHandler.middlerware.js";
 import { registerSchema, loginSchema } from "../validators/auth.validator.js";
-import { registerService, loginService, refreshTokenService } from "../services/auth.service.js";
+import { registerService, loginService, refreshTokenService, verifyEmailService } from "../services/auth.service.js";
 
 export const registerController = asyncHandler(async (req, res) => {
     const body = registerSchema.parse(req.body);
@@ -49,3 +49,13 @@ export const logoutController = asyncHandler(async (req, res) => {
         message: "Logged out successfully",
     });
 });
+
+export const verifyEmailController = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return res.status(400).json({ message: "Email and OTP are required" });
+    }
+    const result = await verifyEmailService(email, otp);
+    return res.status(HTTPSTATUS.OK).json(result);
+});
+

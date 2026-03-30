@@ -80,7 +80,6 @@ const ExportButtons = ({ filters }) => {
         size="sm"
         onClick={handleExportCSV}
         disabled={isExporting}
-        className="!border-gray-500 !text-white !bg-transparent hover:!bg-white/10"
       >
         {isExporting ? (
           <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -93,7 +92,6 @@ const ExportButtons = ({ filters }) => {
         variant="outline"
         size="sm"
         onClick={handlePrint}
-        className="!border-gray-500 !text-white !bg-transparent hover:!bg-white/10"
       >
         <Printer className="h-4 w-4 mr-2" />
         Print

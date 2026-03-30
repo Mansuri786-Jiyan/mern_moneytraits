@@ -27,7 +27,6 @@ const TransactionTable = ({ pageSize, isShowPagination = true, onFiltersChange }
         // Deep compare or just stringify compare for simplicity here
         const filtersString = JSON.stringify(currentFilters);
         if (lastNotifiedFilters.current !== filtersString) {
-            console.log("TransactionTable: Notifying parent of filter change", currentFilters);
             onFiltersChange?.(currentFilters);
             lastNotifiedFilters.current = filtersString;
         }
@@ -41,19 +40,6 @@ const TransactionTable = ({ pageSize, isShowPagination = true, onFiltersChange }
         pageNumber: filter.pageNumber,
         pageSize: filter.pageSize,
     });
-
-    if (error) {
-        console.error("TransactionTable API Error:", error);
-    }
-
-    if (data) {
-        console.log("TransactionTable: Received data:", { 
-            hasTransations: !!data.transations, 
-            transationsCount: data.transations?.length,
-            hasDataTransactions: !!data.data?.transactions,
-            dataTransactionsCount: data.data?.transactions?.length 
-        });
-    }
 
     const transactions = data?.transations || data?.data?.transactions || [];
     const pagination = {

@@ -28,6 +28,10 @@ const userSchema = new Schema({
         default: "USER",
         enum: ["USER", "ADMIN"],
     },
+    isEmailVerified: {
+        type: Boolean,
+        default: false,
+    },
 }, {
     timestamps: true,
 });

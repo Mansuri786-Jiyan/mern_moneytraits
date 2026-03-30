@@ -1,0 +1,244 @@
+=========================================================
+  MONEYTRAITS — FULL AUDIT REPORT & NEXT PLAN
+  Generated: 2026-03-30
+=========================================================
+
+─────────────────────────────────────────
+  SECTION 1: BUGS & ERRORS FOUND
+─────────────────────────────────────────
+
+1. [TYPO — BACKEND] Transaction typo in service & controller
+   File: backend/src/services/transaction.service.js (line 64)
+   File: backend/src/controllers/transaction.controller.js (line 50)
+   Issue: The result key is named "transations" (missing an 'r').
+          The frontend already has a fallback for this
+          (data?.transations || data?.data?.transactions)
+          but the typo should be fixed in production.
+   Fix: Rename "transations" → "transactions" in the service
+        and update the controller/frontend accordingly.
+
+2. [TYPO — BACKEND] "sucess" typo in bulkDelete return value
+   File: backend/src/services/transaction.service.js (line 161)
+   Issue: Returns { sucess: true } instead of { success: true }
+   Fix: Rename "sucess" → "success"
+
+3. [TYPO — BACKEND] "Unknow error occurred" in error handler
+   File: backend/src/middlewares/errorHandler.middleware.js (line 53)
+   Issue: "Unknow" should be "Unknown"
+   Fix: Change to "Unknown error occurred"
+
+4. [TYPO — BACKEND] "calulateNextReportDate" / "calaulatePercentageChange"
+   Files: backend/src/utils/helper.js (referenced)
+          backend/src/services/analytics.service.js (line 418)
+   Issue: Function names have misspelled "calculate"
+   Fix: Rename to "calculateNextReportDate" / "calculatePercentageChange"
+        (low priority, internal only)
+
+5. [SECURITY BUG — BACKEND] Admin registration is open
+   File: backend/src/services/auth.service.js (lines 17-20)
+   Issue: A user can pass role: "ADMIN" in the register body
+          and the server will assign them ADMIN role.
+          There is NO check blocking this — anyone can self-promote.
+   Fix: Remove the role check entirely:
+        let roleToAssign = "USER"; // always USER on public register
+        Admin accounts should be seeded via a script only.
+
+6. [SECURITY — BACKEND] Debug console.log left in production path
+   File: backend/src/controllers/transaction.controller.js (lines 28-30)
+   File: backend/src/controllers/analytics.controller.js
+   Issue: console.log("Transaction Debug: ...") will leak user IDs
+          and filter data in production logs.
+   Fix: Remove all debug console.log statements before deploying.
+
+7. [SECURITY — BACKEND] JWT_SECRET has a weak default value
+   File: backend/src/config/env.config.js (line 19-21)
+   Issue: JWT_SECRET defaults to "secert_jwt"
+          and JWT_REFRESH_SECRET defaults to "secert_jwt_refresh".
+          If .env is not set, the app runs with weak predictable secrets.
+   Fix: Remove the default values — throw an error if the secrets
+        are not set in the environment.
+
+8. [SECURITY — BACKEND] Cron jobs only run in development
+   File: backend/src/index.js (lines 70-72)
+   Issue: initializeCrons() is only called when NODE_ENV === "development".
+          This means scheduled emails / recurring transactions will NOT
+          process in production.
+   Fix: Call initializeCrons() regardless of NODE_ENV,
+        OR ensure your deployment platform handles cron scheduling.
+
+9. [BUG — FRONTEND] Landing page route is /landing not /
+   File: client/src/routes/index.jsx (line 23)
+   Issue: The landing page is reachable at /landing.
+          Unauthenticated users hitting / are redirected to /sign-in
+          instead of seeing the landing page.
+   Fix: Change the landing page route to "/" and redirect
+        authenticated users to /overview instead.
+
+10. [DEBUG LOG — FRONTEND] console.log left in production code
+    Files: client/src/routes/index.jsx (lines 16, 19, 22)
+           client/src/main.jsx (line 12)
+           client/src/components/transaction/transaction-table/index.jsx (lines 30, 50-56)
+           client/src/components/transaction/transaction-form.jsx
+    Issue: Multiple console.log statements will expose internal data
+           and clutter the browser console in production.
+    Fix: Remove all console.log / console.error debug statements
+         before deploying.
+
+11. [MINOR — FRONTEND] 404 page shows plain text "404"
+    File: client/src/routes/index.jsx (line 31)
+    Issue: The wildcard route renders just the string "404"
+           with no styling or navigation.
+    Fix: Create a proper NotFound page component with a
+         "Go back home" button.
+
+12. [MINOR — FRONTEND] index.backup.jsx left in routes folder
+    File: client/src/routes/index.backup.jsx
+    Issue: A backup file is checked in to the repo.
+           This is dead code and could be confusing.
+    Fix: Delete this file.
+
+13. [MINOR — FRONTEND] Reports page is commented out
+    File: client/src/routes/common/routes.jsx (line 10, 26)
+    Issue: The Reports page is imported and registered as a route
+           but is commented out. The page/files still exist.
+    Fix: Either fully remove or fully integrate the Reports page.
+
+14. [UX — FRONTEND] Billing settings show external upsell content
+    File: client/src/pages/settings/billing.jsx
+    Issue: The Billing page shows a message about paying for the
+           "extended version" with an external link. This is content
+           from the original course project template and should be
+           replaced with real content (or removed) for your own app.
+    Fix: Replace with a "Free plan / upgrade coming soon" message
+         or simply remove the Billing tab from settings navigation.
+
+
+─────────────────────────────────────────
+  SECTION 2: DEPLOYMENT READINESS CHECK
+─────────────────────────────────────────
+
+  ✅ READY
+  - MongoDB integration works (Mongoose, proper models)
+  - JWT authentication with refresh token flow
+  - Password hashing (bcrypt)
+  - CORS configured (accepts FRONTEND_ORIGIN env variable)
+  - Global error handler in place (Zod, Multer, AppError)
+  - File uploads via Cloudinary
+  - Email via Nodemailer (SMTP)
+  - AI integration via Google Gemini
+  - Frontend Redux + state persistence (redux-persist)
+  - Vite frontend build system (production build ready)
+
+  ⚠️  NOT READY — Must Fix Before Deploy
+  - Security: Admin self-registration must be blocked (#5)
+  - Security: Weak default JWT secrets must be removed (#7)
+  - Cron jobs must run in production (#8)
+  - Landing page must be the "/" route (#9)
+  - Remove all debug console.log statements (#6, #10)
+
+  ⚠️  RECOMMENDED Before Deploy
+  - Fix typos in API response keys (#1, #2)
+  - Create a proper 404 page (#11)
+  - Replace/remove Billing upsell content (#14)
+  - Add rate limiting (e.g. express-rate-limit) on auth endpoints
+  - Add Helmet.js security headers (it is already installed!)
+    → app.use(helmet()) is missing from index.js
+  - Set NODE_ENV=production properly on your server
+  - Backend: Add input sanitization for free-text fields
+
+
+─────────────────────────────────────────
+  SECTION 3: WHAT SHOULD BE NEXT?
+─────────────────────────────────────────
+
+These are recommended features and improvements, ordered by priority.
+
+  PRIORITY 1 — Critical (do before going live)
+  ─────────────────────────────────────────────
+  □ Fix the 5 "Not Ready" deployment issues listed above
+  □ Enable Helmet.js in backend/src/index.js (app.use(helmet()))
+  □ Add rate limiting on /auth routes (prevent brute force)
+  □ Write a seeding script to create the first admin user
+    instead of allowing self-registration as admin
+  □ Replace Billing page placeholder content
+
+  PRIORITY 2 — High Value Features
+  ─────────────────────────────────────────────
+  □ PROPER LANDING PAGE ROUTING
+    Make "/" the landing page for unauthenticated users and
+    redirect authenticated users to /overview automatically.
+
+  □ GOALS PAGE
+    The goals folder and backend exist but the Goals page
+    appears to be an empty placeholder. Build out
+    goal creation, tracking progress, and completion UI.
+
+  □ EMAIL VERIFICATION
+    Currently users can register with any email without
+    verifying it. Add an email verification step on signup.
+
+  □ PROPER 404 PAGE
+    Build a styled "Page Not Found" screen with a home button.
+
+  PRIORITY 3 — Quality of Life
+  ─────────────────────────────────────────────
+  □ DARK MODE CONSISTENCY
+    Audit all pages for hardcoded bg-white / text-white
+    that break in dark mode (similar to the Transaction page fix).
+
+  □ MOBILE RESPONSIVENESS AUDIT
+    Test and fix the Transaction table, AI Insights chat,
+    and Dashboard on phone screen sizes.
+
+  □ LOADING SKELETONS
+    Some pages show blank states while loading data.
+    Add skeleton loaders for a more polished feel.
+
+  □ EMPTY STATES
+    Show helpful empty state UI when users have no transactions,
+    no budgets, no goals yet — with a CTA button to add their first one.
+
+  PRIORITY 4 — Nice to Have / Future
+  ─────────────────────────────────────────────
+  □ ONBOARDING FLOW
+    After signup, walk new users through adding their first
+    transaction and setting a budget goal.
+
+  □ NOTIFICATIONS / ALERTS
+    In-app alerts when a budget is exceeded or a goal is met.
+
+  □ MULTI-CURRENCY SUPPORT
+    Currently amounts are stored and displayed but currency
+    handling is hardcoded in places.
+
+  □ EXPORT TO PDF
+    In addition to CSV, let users export reports as PDFs.
+
+  □ PWA / OFFLINE SUPPORT
+    Make the app installable as a Progressive Web App on mobile.
+
+  □ FORGOT PASSWORD FLOW IMPROVEMENT
+    The forgot password page is large and complex — test all
+    edge cases (expired tokens, repeated resets, etc.)
+
+  □ ADMIN DASHBOARD
+    The admin page exists but likely needs more functionality
+    — user management, system stats, manual cron triggers.
+
+
+─────────────────────────────────────────
+  SUMMARY
+─────────────────────────────────────────
+
+  Total bugs found:        14
+  Critical (block deploy): 5
+  Security issues:         4
+  Minor / typos:           5
+
+  The app is about 80% ready for deployment.
+  Fix the 5 critical issues and it can go live as a beta.
+  The remaining items are polish and future features.
+
+=========================================================
+  END OF REPORT
+=========================================================

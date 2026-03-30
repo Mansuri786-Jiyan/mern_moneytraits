@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import dashboardLight from "@/assets/images/dashboard.png";
-import dashboardDark from "@/assets/images/dashboard_dark.png";
+import dashboardLight from "@/assets/images/dashboard.jpg";
+import dashboardDark from "@/assets/images/dashboard_dark.jpg";
 
 const HeroSection = () => {
   return (

@@ -68,7 +68,7 @@ export default function Transactions() {
       }
     >
       {activeTab === "transactions" ? (
-        <Card className="border-0 shadow-none mt-4 bg-white rounded-2xl overflow-hidden animate-in fade-in duration-500">
+        <Card className="border-0 shadow-none mt-4 rounded-2xl overflow-hidden animate-in fade-in duration-500 bg-card text-card-foreground">
           <CardContent className="p-0 sm:p-6">
             <div className="flex items-center justify-between mb-4 px-4 sm:px-0 pt-4 sm:pt-0">
               <h3 className="text-lg font-bold">Transaction History</h3>
@@ -83,7 +83,7 @@ export default function Transactions() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="border shadow-none mt-4 bg-white rounded-2xl overflow-hidden animate-in fade-in duration-500">
+        <Card className="border shadow-none mt-4 rounded-2xl overflow-hidden animate-in fade-in duration-500 bg-card text-card-foreground">
           <CardContent className="p-6">
             <ReportHistorySection />
           </CardContent>

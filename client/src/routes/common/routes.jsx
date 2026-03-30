@@ -3,6 +3,7 @@ import { AUTH_ROUTES, PROTECTED_ROUTES } from "./routePath.jsx";
 import SignIn from "@/pages/auth/sign-in";
 import SignUp from "@/pages/auth/sign-up";
 import ForgotPassword from "@/pages/auth/forgot-password";
+import VerifyEmailPage from "@/pages/auth/verify-email";
 import Dashboard from "@/pages/dashboard";
 import Transactions from "@/pages/transactions";
 import Budget from "@/pages/budget";
@@ -17,6 +18,7 @@ export const authenticationRoutePaths = [
     { path: AUTH_ROUTES.SIGN_IN, element: _jsx(SignIn, {}) },
     { path: AUTH_ROUTES.SIGN_UP, element: _jsx(SignUp, {}) },
     { path: AUTH_ROUTES.FORGOT_PASSWORD, element: _jsx(ForgotPassword, {}) },
+    { path: AUTH_ROUTES.VERIFY_EMAIL, element: _jsx(VerifyEmailPage, {}) },
 ];
 export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.OVERVIEW, element: _jsx(Dashboard, {}), userOnly: true },
@@ -28,7 +30,7 @@ export const protectedRoutePaths = [
     { path: PROTECTED_ROUTES.SETTINGS,
         element: _jsx(Settings, {}),
         children: [
-            { index: true, element: _jsx(Account, {}) }, // Default route
+            { index: true, element: _jsx(Account, {}) },
             { path: PROTECTED_ROUTES.SETTINGS, element: _jsx(Account, {}) },
             { path: PROTECTED_ROUTES.SETTINGS_APPEARANCE, element: _jsx(Appearance, {}) },
             { path: PROTECTED_ROUTES.SETTINGS_BILLING, element: _jsx(Billing, {}) },

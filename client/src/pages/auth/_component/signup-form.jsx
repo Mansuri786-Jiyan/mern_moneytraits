@@ -26,8 +26,8 @@ const SignUpForm = () => {
             .unwrap()
             .then(() => {
             form.reset();
-            toast.success("Sign up successful");
-            navigate(AUTH_ROUTES.SIGN_IN);
+            toast.success("Account created! Please check your email for the verification OTP.");
+            navigate(`${AUTH_ROUTES.VERIFY_EMAIL}?email=${encodeURIComponent(values.email)}`);
         })
             .catch((error) => {
             toast.error(error.data?.message || "Failed to sign up");

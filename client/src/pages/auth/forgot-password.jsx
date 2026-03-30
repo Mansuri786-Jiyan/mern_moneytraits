@@ -19,8 +19,8 @@ import {
   useResetPasswordMutation,
 } from "@/features/auth/authAPI";
 
-import dashboardImg from "../../assets/images/dashboard_.png";
-import dashboardImgDark from "../../assets/images/dashboard_dark.png";
+import dashboardImg from "../../assets/images/dashboard_.jpg";
+import dashboardImgDark from "../../assets/images/dashboard_dark.jpg";
 
 const emailSchema = z.object({ email: z.string().email("Invalid email address") });
 const passwordSchema = z.object({

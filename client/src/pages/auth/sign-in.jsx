@@ -1,8 +1,8 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import SignInForm from "./_component/signin-form.jsx";
 import Logo from "@/components/logo/logo";
-import dashboardImg from "../../assets/images/dashboard_.png";
-import dashboardImgDark from "../../assets/images/dashboard_dark.png";
+import dashboardImg from "../../assets/images/dashboard_.jpg";
+import dashboardImgDark from "../../assets/images/dashboard_dark.jpg";
 import { useTheme } from "@/context/theme-provider";
 const SignIn = () => {
     const { theme } = useTheme();
