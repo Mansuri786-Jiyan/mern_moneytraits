@@ -24,11 +24,11 @@ const envConfig = () => {
         CLOUDINARY_CLOUD_NAME: getEnv("CLOUDINARY_CLOUD_NAME"),
         CLOUDINARY_API_KEY: getEnv("CLOUDINARY_API_KEY"),
         CLOUDINARY_API_SECRET: getEnv("CLOUDINARY_API_SECRET"),
-        SMTP_HOST: getEnv("SMTP_HOST", "127.0.0.1"),
+        SMTP_HOST: getEnv("SMTP_HOST"),
         SMTP_PORT: Number(getEnv("SMTP_PORT", "587")),
         MAIL_USER: getEnv("MAIL_USER"),
         MAIL_PASS: getEnv("MAIL_PASS"),
-        FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN", "localhost"),
+        FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN"),
     };
     return config;
 };
