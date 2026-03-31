@@ -26,29 +26,43 @@ import chatbotRoutes from "./routes/chatbot.route.js";
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
-
+// CORS FIX (IMPORTANT)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mern-moneytraits-gtwj.vercel.app"
+];
 
 app.use(cors({
-    origin(origin, callback) {
-        if (!origin || origin === Env.FRONTEND_ORIGIN || /^https?:\/\/localhost:\d+$/.test(origin)) {
-            callback(null, true);
-            return;
-        }
-        callback(new Error("CORS not allowed for this origin"));
-    },
-    credentials: true,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin);
+      return callback(new Error("CORS not allowed"));
+    }
+  },
+  credentials: true,
 }));
 
+// Handle preflight requests
+app.options("*", cors());
 
-app.get("/", asyncHandler(async (req, res, next) => {
-    res.status(HTTPSTATUS.OK).json({
-        message: "Backend API is running",
-    });
+// Body parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(passport.initialize());
+
+// Health check route
+app.get("/", asyncHandler(async (req, res) => {
+  res.status(HTTPSTATUS.OK).json({
+    message: "Backend API is running",
+  });
 }));
 
+// Routes
 app.use(`${BASE_PATH}/auth`, authRoutes);
 app.use(`${BASE_PATH}/auth`, passwordResetRoutes);
 app.use(`${BASE_PATH}/user`, passportAuthenticateJwt, userRoutes);
@@ -63,9 +77,12 @@ app.use(`${BASE_PATH}/forecast`, passportAuthenticateJwt, forecastRoutes);
 app.use(`${BASE_PATH}/chatbot`, passportAuthenticateJwt, chatbotRoutes);
 app.use(`${BASE_PATH}/admin`, adminRoutes);
 
+// Error handler
 app.use(errorHandler);
 
+// Start server
 app.listen(Env.PORT, async () => {
-    await connectDatabase();
-    await initializeCrons();
+  console.log(`Server running on port ${Env.PORT}`);
+  await connectDatabase();
+  await initializeCrons();
 });
