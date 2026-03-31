@@ -46,9 +46,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Handle preflight requests
-app.options("*", cors());
-
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,8 +54,10 @@ app.use(passport.initialize());
 
 // Health check route
 app.get("/", asyncHandler(async (req, res) => {
+  console.log("Health check hit! SMTP_HOST = ", Env.SMTP_HOST);
   res.status(HTTPSTATUS.OK).json({
     message: "Backend API is running",
+    smtpHost: Env.SMTP_HOST // Temp to debug what Render sees!
   });
 }));
 
