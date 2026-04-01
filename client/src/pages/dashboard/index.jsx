@@ -7,7 +7,7 @@ import ExpensePieChart from "./expense-pie-chart.jsx";
 import DashboardRecentTransactions from "./dashboard-recent-transactions.jsx";
 import BudgetOverviewWidget from "./_component/budget-overview-widget.jsx";
 import BudgetAlertsWidget from "./_component/budget-alerts-widget.jsx";
-import SpendingForecast from "./_component/spending-forecast.jsx";
+
 import { useState } from "react";
 const Dashboard = () => {
   const [dateRange, _setDateRange] = useState(null);
@@ -34,12 +34,9 @@ const Dashboard = () => {
           ],
         }),
         _jsx(BudgetAlertsWidget, {}),
-        _jsxs("div", {
-          className: "w-full grid grid-cols-1 lg:grid-cols-2 gap-8",
-          children: [
-            _jsx(SpendingForecast, {}),
-            _jsx(BudgetOverviewWidget, {}),
-          ],
+        _jsx("div", {
+          className: "w-full",
+          children: _jsx(BudgetOverviewWidget, {}),
         }),
         _jsx("div", {
           className: "w-full mt-0",
