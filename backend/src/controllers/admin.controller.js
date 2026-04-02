@@ -15,16 +15,16 @@ export const getAdminDashboardController = asyncHandler(async (req, res) => {
         {
             $group: {
                 _id: null,
-                totalIncome: { P+
+                totalIncome: {
                     $sum: {
-            $cond: [{ $eq: ["$type", TransactionTypeEnum.INCOME] }, "$amount", 0]
-        }
+                        $cond: [{ $eq: ["$type", TransactionTypeEnum.INCOME] }, "$amount", 0]
+                    }
                 },
-    totalExpenses: {
-    $sum: {
-        $cond: [{ $eq: ["$type", TransactionTypeEnum.EXPENSE] }, "$amount", 0]
-    }
-}
+                totalExpenses: {
+                    $sum: {
+                        $cond: [{ $eq: ["$type", TransactionTypeEnum.EXPENSE] }, "$amount", 0]
+                    }
+                }
             }
         }
     ]);
