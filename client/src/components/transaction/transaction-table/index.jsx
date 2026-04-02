@@ -41,7 +41,7 @@ const TransactionTable = ({ pageSize, isShowPagination = true, onFiltersChange }
         pageSize: filter.pageSize,
     });
 
-    const transactions = data?.transations || data?.data?.transactions || [];
+    const transactions = data?.transactions || data?.data?.transactions || [];
     const pagination = {
         totalItems: data?.pagination?.totalCount || 0,
         totalPages: data?.pagination?.totalPages || 0,

@@ -10,35 +10,35 @@ import { subDays, startOfDay, endOfDay } from "date-fns";
 
 export const getAdminDashboardController = asyncHandler(async (req, res) => {
     const totalUsers = await UserModel.countDocuments();
-    
+
     const stats = await TransactionModel.aggregate([
         {
             $group: {
                 _id: null,
-                totalIncome: {P+
+                totalIncome: { P+
                     $sum: {
-                        $cond: [{ $eq: ["$type", TransactionTypeEnum.INCOME] }, "$amount", 0]
-                    }
+            $cond: [{ $eq: ["$type", TransactionTypeEnum.INCOME] }, "$amount", 0]
+        }
                 },
-                totalExpenses: {
-                    $sum: {
-                        $cond: [{ $eq: ["$type", TransactionTypeEnum.EXPENSE] }, "$amount", 0]
-                    }
-                }
+    totalExpenses: {
+    $sum: {
+        $cond: [{ $eq: ["$type", TransactionTypeEnum.EXPENSE] }, "$amount", 0]
+    }
+}
             }
         }
     ]);
 
-    const { totalIncome = 0, totalExpenses = 0 } = stats[0] || {};
+const { totalIncome = 0, totalExpenses = 0 } = stats[0] || {};
 
-    return res.status(HTTPSTATUS.OK).json({
-        message: "Admin dashboard stats fetched successfully",
-        data: {
-            totalUsers,
-            totalIncome: convertToDollarUnit(totalIncome),
-            totalExpenses: convertToDollarUnit(totalExpenses)
-        }
-    });
+return res.status(HTTPSTATUS.OK).json({
+    message: "Admin dashboard stats fetched successfully",
+    data: {
+        totalUsers,
+        totalIncome: convertToDollarUnit(totalIncome),
+        totalExpenses: convertToDollarUnit(totalExpenses)
+    }
+});
 });
 
 export const getAdminUsersController = asyncHandler(async (req, res) => {
