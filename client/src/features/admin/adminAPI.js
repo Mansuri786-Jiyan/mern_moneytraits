@@ -24,6 +24,13 @@ export const adminApi = apiClient.injectEndpoints({
             }),
             invalidatesTags: ["users", "admin-stats"],
         }),
+        toggleAdminUserBlock: builder.mutation({
+            query: (id) => ({
+                url: `/admin/users/${id}/block`,
+                method: "PATCH",
+            }),
+            invalidatesTags: ["users"],
+        }),
         deleteAdminUser: builder.mutation({
             query: (id) => ({
                 url: `/admin/users/${id}`,
@@ -52,6 +59,7 @@ export const {
     useGetAdminDashboardQuery, 
     useGetAdminUsersQuery, 
     useUpdateAdminUserRoleMutation, 
+    useToggleAdminUserBlockMutation,
     useDeleteAdminUserMutation,
     useGetAdminTransactionsQuery,
     useGetAdminAnalyticsQuery

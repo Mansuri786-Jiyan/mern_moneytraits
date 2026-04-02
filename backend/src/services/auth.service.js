@@ -96,6 +96,10 @@ export const loginService = async (body) => {
         throw new UnauthorizedException("Please verify your email before logging in. Check your inbox for the OTP.");
     }
 
+    if (user.isBlocked) {
+        throw new UnauthorizedException("Your account has been blocked by an administrator. Please contact support.");
+    }
+
     const { token, expiresAt } = signJwtToken({ userId: user.id });
     const reportSetting = await ReportSettingModel.findOne({
         userId: user.id,
@@ -161,6 +165,10 @@ export const refreshTokenService = async (accessToken) => {
     const user = await UserModel.findById(decoded.userId);
     if (!user) {
         throw new UnauthorizedException("User not found");
+    }
+
+    if (user.isBlocked) {
+        throw new UnauthorizedException("Your account has been blocked by an administrator.");
     }
 
     const { token, expiresAt } = signJwtToken({ userId: user.id });

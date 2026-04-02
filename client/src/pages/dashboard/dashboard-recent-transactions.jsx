@@ -1,6 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Link } from "react-router-dom";
-import TransactionTable from "@/components/transaction/transaction-table";
+import PremiumTransactionTable from "@/components/transaction/premium-transaction-table/index.jsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,34 @@ const DashboardRecentTransactions = () => {
     const { data: transactionData } = useGetAllTransactionsQuery({ pageNumber: 1, pageSize: 1 });
     const isTransactionsEmpty = transactionData?.pagination?.totalCount === 0;
 
-    return (_jsxs(Card, { className: "!shadow-none border-1 border-gray-100 dark:border-border", children: [_jsxs(CardHeader, { className: "!pb-0", children: [_jsx(CardTitle, { className: "text-xl", children: "Recent Transactions" }), _jsx(CardDescription, { children: "Showing all recent transactions" }), _jsx(CardAction, { children: _jsx(Button, { asChild: true, variant: "link", className: "!text-gray-700 dark:!text-gray-200 !font-normal", children: _jsx(Link, { to: PROTECTED_ROUTES.TRANSACTIONS, children: "View all" }) }) }), _jsx(Separator, { className: "mt-3 !bg-gray-100 dark:!bg-gray-800" })] }), _jsx(CardContent, { className: "pt-0", children: isTransactionsEmpty ? (_jsxs("div", { className: "flex flex-col items-center justify-center py-8", children: [_jsx(EmptyState, { title: "No transactions yet", description: "Add your first transaction to start tracking your finances", icon: PlusCircleIcon }), _jsx("div", { className: "mt-4", children: _jsx(AddTransactionDrawer, {}) })] })) : (_jsx(TransactionTable, { pageSize: 10, isShowPagination: false })) })] }));
+    return (_jsxs("div", {
+        className: "bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700",
+        children: [
+            _jsxs("div", {
+                className: "flex items-center justify-between p-6 pb-2",
+                children: [
+                    _jsxs("div", {
+                        className: "space-y-1",
+                        children: [
+                            _jsx("h3", { className: "text-xl font-bold text-white", children: "Recent Transactions" }),
+                            _jsx("p", { className: "text-slate-400 text-sm font-medium", children: "Showing your latest activity" })
+                        ]
+                    }),
+                    _jsx(Button, { asChild: true, variant: "ghost", className: "text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-sm", children: _jsx(Link, { to: PROTECTED_ROUTES.TRANSACTIONS, children: "View all" }) })
+                ]
+            }),
+            _jsx("div", {
+                className: "px-2 pb-2",
+                children: isTransactionsEmpty ? (
+                    _jsxs("div", { className: "flex flex-col items-center justify-center py-12", children: [
+                        _jsx(EmptyState, { title: "No transactions yet", description: "Add your first transaction to start tracking your finances", icon: PlusCircleIcon }),
+                        _jsx("div", { className: "mt-6", children: _jsx(AddTransactionDrawer, {}) })
+                    ] })
+                ) : (
+                    _jsx(PremiumTransactionTable, { pageSize: 10, isShowPagination: false })
+                )
+            })
+        ]
+    }));
 };
 export default DashboardRecentTransactions;

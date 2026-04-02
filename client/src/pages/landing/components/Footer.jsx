@@ -1,46 +1,90 @@
-import { Wallet, Twitter, Github, Linkedin } from "lucide-react";
+import { Mail, Phone, MapPin, Twitter, Github, Linkedin } from "lucide-react";
+import Logo from "@/components/logo/logo";
 
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-border/40 bg-background py-12">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-          <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <Wallet className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600 dark:to-blue-400">
-                Moneytraits
-              </span>
+    <footer id="contact" className="bg-white dark:bg-[#09090b] pt-20 pb-10 transition-colors duration-300">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
+          
+          {/* Logo & Description */}
+          <div className="col-span-1 lg:col-span-2">
+            <div className="flex items-center gap-2 mb-6 pointer-events-none">
+               <Logo url="/" />
             </div>
-            <p className="text-muted-foreground text-sm max-w-sm mb-6">
-              AI-powered financial management for the modern era. Take control of your wealth with intelligent tracking and forecasting.
+            <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed max-w-xs text-sm">
+              The ultimate AI-powered expense tracking and financial planning tool. Track, analyze, and build your wealth with intelligent insights.
             </p>
-            <div className="flex gap-4">
-              <button aria-label="Twitter" className="text-muted-foreground hover:text-foreground transition-colors"><Twitter className="h-5 w-5" /></button>
-              <button aria-label="GitHub" className="text-muted-foreground hover:text-foreground transition-colors"><Github className="h-5 w-5" /></button>
-              <button aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors"><Linkedin className="h-5 w-5" /></button>
-            </div>
           </div>
+
+          {/* Links Grid */}
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Roadmap</a></li>
+            <h4 className="text-slate-900 dark:text-white font-semibold text-sm mb-6 tracking-tight">Platform</h4>
+            <ul className="space-y-4">
+              {["Features", "How it Works", "Integrations", "Pricing"].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm font-medium transition-colors"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
+            <h4 className="text-slate-900 dark:text-white font-semibold text-sm mb-6 tracking-tight">Company</h4>
+            <ul className="space-y-4">
+              {["About Us", "Careers", "Blog", "Contact"].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm font-medium transition-colors"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
+
+          <div>
+            <h4 className="text-slate-900 dark:text-white font-semibold text-sm mb-6 tracking-tight">Legal</h4>
+            <ul className="space-y-4">
+              {["Privacy Policy", "Terms of Service", "Cookie Policy", "Security"].map((item) => (
+                <li key={item}>
+                  <a
+                    href="#"
+                    className="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 text-sm font-medium transition-colors"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
         </div>
-        <div className="pt-8 border-t border-border/40 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Moneytraits. All rights reserved.</p>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-slate-200 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-slate-500 dark:text-slate-500 text-sm font-medium">
+            © {new Date().getFullYear()} Moneytraits Inc. All rights reserved.
+          </p>
+          
+          <div className="flex gap-4">
+             <a href="#" className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+               <Twitter className="w-5 h-5" />
+             </a>
+             <a href="#" className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+               <Github className="w-5 h-5" />
+             </a>
+             <a href="#" className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+               <Linkedin className="w-5 h-5" />
+             </a>
+          </div>
         </div>
       </div>
     </footer>

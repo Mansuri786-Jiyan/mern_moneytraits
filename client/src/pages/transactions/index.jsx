@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import PageLayout from "@/components/page-layout";
 import AddTransactionDrawer from "@/components/transaction/add-transaction-drawer";
-import TransactionTable from "@/components/transaction/transaction-table";
+import PremiumTransactionTable from "@/components/transaction/premium-transaction-table/index.jsx";
 import ImportTransactionModal from "@/components/transaction/import-transaction-modal";
 
 import GenerateReportDrawer from "./_components/generate-report-drawer";
@@ -68,20 +68,18 @@ export default function Transactions() {
       }
     >
       {activeTab === "transactions" ? (
-        <Card className="border-0 shadow-none mt-4 rounded-2xl overflow-hidden animate-in fade-in duration-500 bg-card text-card-foreground">
-          <CardContent className="p-0 sm:p-6">
-            <div className="flex items-center justify-between mb-4 px-4 sm:px-0 pt-4 sm:pt-0">
-              <h3 className="text-lg font-bold">Transaction History</h3>
-              <ExportButtons filters={filters} />
-            </div>
-            <div className="print-area">
-              <TransactionTable 
-                pageSize={20} 
-                onFiltersChange={setFilters}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-4 sm:px-0 pt-4">
+            <h3 className="text-lg font-bold text-white/90">Transaction History</h3>
+            <ExportButtons filters={filters} />
+          </div>
+          <div className="print-area">
+            <PremiumTransactionTable 
+              pageSize={20} 
+              onFiltersChange={setFilters}
+            />
+          </div>
+        </div>
       ) : (
         <Card className="border shadow-none mt-4 rounded-2xl overflow-hidden animate-in fade-in duration-500 bg-card text-card-foreground">
           <CardContent className="p-6">

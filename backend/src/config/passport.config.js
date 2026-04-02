@@ -14,7 +14,7 @@ passport.use(new Strategy(options, async (payload, done) => {
             return done(null, false, { message: "Invalid token payload" });
         }
         const user = await findByIdUserService(payload.userId);
-        if (!user) {
+        if (!user || user.isBlocked) {
             return done(null, false);
         }
         return done(null, user);

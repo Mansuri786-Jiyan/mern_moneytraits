@@ -86,11 +86,29 @@ export const deleteAdminUserController = asyncHandler(async (req, res) => {
         throw new NotFoundException("User not found");
     }
 
-    // Optionally delete user's transactions too, but requirement didn't specify
-    // await TransactionModel.deleteMany({ userId });
-
     return res.status(HTTPSTATUS.OK).json({
         message: "User deleted successfully"
+    });
+});
+
+export const toggleAdminUserBlockController = asyncHandler(async (req, res) => {
+    const userId = req.params.id;
+
+    if (String(userId) === String(req.user._id)) {
+        throw new BadRequestException("You cannot block your own admin account");
+    }
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        throw new NotFoundException("User not found");
+    }
+
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+
+    return res.status(HTTPSTATUS.OK).json({
+        message: user.isBlocked ? "User has been blocked successfully" : "User has been unblocked successfully",
+        data: user.omitPassword()
     });
 });
 

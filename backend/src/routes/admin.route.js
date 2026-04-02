@@ -7,7 +7,8 @@ import {
     updateAdminUserRoleController,
     deleteAdminUserController,
     getAdminTransactionsController,
-    getAdminAnalyticsController
+    getAdminAnalyticsController,
+    toggleAdminUserBlockController
 } from "../controllers/admin.controller.js";
 
 const adminRoutes = Router();
@@ -19,6 +20,7 @@ adminRoutes.use(authorizeRoles("ADMIN"));
 adminRoutes.get("/dashboard", getAdminDashboardController);
 adminRoutes.get("/users", getAdminUsersController);
 adminRoutes.patch("/users/:id/role", updateAdminUserRoleController);
+adminRoutes.patch("/users/:id/block", toggleAdminUserBlockController);
 adminRoutes.delete("/users/:id", deleteAdminUserController);
 adminRoutes.get("/transactions", getAdminTransactionsController);
 adminRoutes.get("/analytics", getAdminAnalyticsController);
