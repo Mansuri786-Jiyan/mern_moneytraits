@@ -15,7 +15,7 @@ const DashboardRecentTransactions = () => {
     const isTransactionsEmpty = transactionData?.pagination?.totalCount === 0;
 
     return (_jsxs("div", {
-        className: "bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700",
+        className: "bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl dark:shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700",
         children: [
             _jsxs("div", {
                 className: "flex items-center justify-between p-6 pb-2",
@@ -23,11 +23,11 @@ const DashboardRecentTransactions = () => {
                     _jsxs("div", {
                         className: "space-y-1",
                         children: [
-                            _jsx("h3", { className: "text-xl font-bold text-white", children: "Recent Transactions" }),
-                            _jsx("p", { className: "text-slate-400 text-sm font-medium", children: "Showing your latest activity" })
+                            _jsx("h3", { className: "text-xl font-bold text-slate-900 dark:text-white", children: "Recent Transactions" }),
+                            _jsx("p", { className: "text-slate-500 dark:text-slate-400 text-sm font-medium", children: "Showing your latest activity" })
                         ]
                     }),
-                    _jsx(Button, { asChild: true, variant: "ghost", className: "text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-sm", children: _jsx(Link, { to: PROTECTED_ROUTES.TRANSACTIONS, children: "View all" }) })
+                    _jsx(Button, { asChild: true, variant: "ghost", className: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-500/10 font-bold text-sm", children: _jsx(Link, { to: PROTECTED_ROUTES.TRANSACTIONS, children: "View all" }) })
                 ]
             }),
             _jsx("div", {

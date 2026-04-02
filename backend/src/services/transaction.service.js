@@ -52,7 +52,7 @@ export const getAllTransactionService = async (userId, filters, pagination) => {
     }
     const { pageSize, pageNumber } = pagination;
     const skip = (pageNumber - 1) * pageSize;
-    const [transations, totalCount] = await Promise.all([
+    const [transactions, totalCount] = await Promise.all([
         TransactionModel.find(filterConditions)
             .skip(skip)
             .limit(pageSize)
@@ -61,7 +61,7 @@ export const getAllTransactionService = async (userId, filters, pagination) => {
     ]);
     const totalPages = Math.ceil(totalCount / pageSize);
     return {
-        transations,
+        transactions,
         pagination: {
             pageSize,
             pageNumber,
@@ -156,7 +156,7 @@ export const bulkDeleteTransactionService = async (userId, transactionIds) => {
         userId,
     });
     if (result.deletedCount === 0)
-        throw new NotFoundException("No transations found");
+        throw new NotFoundException("No transactions found");
     return {
         sucess: true,
         deletedCount: result.deletedCount,
@@ -201,13 +201,22 @@ export const scanReceiptService = async (file) => {
             throw new BadRequestException("File upload failed - no path found");
         }
         // Download image from Cloudinary
-        const responseData = await axios.get(file.path, {
-            responseType: "arraybuffer",
-        });
+        let responseData;
+        try {
+            responseData = await axios.get(file.path, {
+                responseType: "arraybuffer",
+            });
+        } catch (axiosError) {
+            console.error("Axios Image Download Error:", axiosError.message);
+            throw new Error(`Failed to download image from Cloudinary: ${axiosError.message}`);
+        }
+        
         const base64String = Buffer.from(responseData.data).toString("base64");
         if (!base64String) {
             throw new BadRequestException("Could not process file to base64");
         }
+
+        console.log("Preparing Gemini AI request...");
         const result = await genAI.models.generateContent({
             model: genAIModel,
             contents: [
@@ -230,16 +239,30 @@ export const scanReceiptService = async (file) => {
                 responseMimeType: "application/json",
             },
         });
-        const rawText = result.text;
+
+        // The @google/genai SDK returns result.text for non-streaming calls
+        const rawText = result.text || (typeof result.response?.text === 'function' ? await result.response.text() : "");
+        
+        console.log("Gemini Raw Response:", rawText);
+
         // Remove markdown formatting if Gemini returns it
         const cleanedText = rawText?.replace(/```json|```/g, "").trim();
         if (!cleanedText) {
-            return { error: "Could not read receipt content" };
+            throw new Error("Could not read receipt content from AI response");
         }
-        const data = JSON.parse(cleanedText);
+
+        let data;
+        try {
+            data = JSON.parse(cleanedText);
+        } catch (parseError) {
+            console.error("JSON Parsing Error:", parseError.message, "Cleaned Text:", cleanedText);
+            throw new Error("Failed to parse receipt data. Please try again with a clearer image.");
+        }
+
         if (!data.amount || !data.date) {
-            return { error: "Receipt missing required fields" };
+            throw new Error("Receipt missing required fields (amount or date)");
         }
+
         return {
             title: data.title || "Receipt Expense",
             amount: Number(data.amount),
@@ -252,10 +275,8 @@ export const scanReceiptService = async (file) => {
         };
     }
     catch (error) {
-        console.error("Receipt Scan Error:", error);
-        return {
-            error: "Receipt scanning service unavailable",
-            details: error.message,
-        };
+        console.error("Critical Receipt Scan Error:", error);
+        // Throwing the error so it's caught by asyncHandler and returns 500/400 properly
+        throw error;
     }
 };

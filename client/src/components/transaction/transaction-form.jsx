@@ -78,15 +78,15 @@ const TransactionForm = (props) => {
     useEffect(() => {
         if (isEdit && transactionId && editData) {
             form.reset({
-                title: editData?.title,
-                amount: editData.amount.toString(),
-                type: editData.type,
-                category: editData.category?.toLowerCase(),
-                date: new Date(editData.date),
-                paymentMethod: editData.paymentMethod,
-                isRecurring: editData.isRecurring,
-                frequency: editData.recurringInterval,
-                description: editData.description,
+                title: editData?.title || "",
+                amount: editData.amount?.toString() || "",
+                type: editData.type || _TRANSACTION_TYPE.INCOME,
+                category: editData.category?.toLowerCase() || "",
+                date: editData.date ? new Date(editData.date) : new Date(),
+                paymentMethod: editData.paymentMethod || "",
+                isRecurring: editData.isRecurring || false,
+                frequency: editData.recurringInterval || null,
+                description: editData.description || "",
             });
         }
     }, [editData, form, isEdit, transactionId]);

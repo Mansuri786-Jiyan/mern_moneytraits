@@ -138,14 +138,14 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
   return (
     <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/40 backdrop-blur-xl border border-white/10 p-4 rounded-2xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-4 rounded-2xl">
         <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-white transition-colors" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 dark:text-slate-400 group-focus-within:text-slate-900 dark:group-focus-within:text-white transition-colors" />
           <Input
             placeholder="Search transactions..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            className="pl-10 h-11 bg-white/5 border-white/5 focus:border-white/20 text-white placeholder:text-slate-500 rounded-xl transition-all"
+            className="pl-10 h-11 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 focus:border-slate-300 dark:focus:border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl transition-all"
           />
         </div>
         
@@ -154,13 +154,13 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
             value={filter.type || "ALL"}
             onValueChange={(val) => setFilter(p => ({ ...p, type: val === "ALL" ? undefined : val, pageNumber: 1 }))}
           >
-            <SelectTrigger className="h-11 w-[140px] bg-white/5 border-white/5 text-slate-300 rounded-xl focus:ring-0">
+            <SelectTrigger className="h-11 w-[140px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
               <div className="flex items-center gap-2">
                 <Filter className="h-3.5 w-3.5" />
                 <SelectValue placeholder="All Types" />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-white/10 text-slate-300">
+            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
               <SelectItem value="ALL">All Types</SelectItem>
               <SelectItem value={_TRANSACTION_TYPE.INCOME}>Income</SelectItem>
               <SelectItem value={_TRANSACTION_TYPE.EXPENSE}>Expense</SelectItem>
@@ -171,10 +171,10 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
             value={filter.recurringStatus || "ALL"}
             onValueChange={(val) => setFilter(p => ({ ...p, recurringStatus: val === "ALL" ? undefined : val, pageNumber: 1 }))}
           >
-            <SelectTrigger className="h-11 w-[160px] bg-white/5 border-white/5 text-slate-300 rounded-xl focus:ring-0">
+            <SelectTrigger className="h-11 w-[160px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
               <SelectValue placeholder="Frequency" />
             </SelectTrigger>
-            <SelectContent className="bg-slate-900 border-white/10 text-slate-300">
+            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
               <SelectItem value="ALL">All Frequency</SelectItem>
               <SelectItem value="RECURRING">Recurring</SelectItem>
               <SelectItem value="NON_RECURRING">One-time</SelectItem>
@@ -197,17 +197,17 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
       </div>
 
       {/* Main Container */}
-      <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="bg-white/80 dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-xl dark:shadow-2xl">
         {/* DESKTOP TABLE VIEW */}
         <div className="hidden md:block overflow-x-auto relative">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02] sticky top-0 backdrop-blur-md z-10">
+              <tr className="border-b border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] sticky top-0 backdrop-blur-md z-10">
                 <th className="px-6 py-4 w-10">
                   <Checkbox
                     checked={selectedRows.length > 0 && selectedRows.length === transactions.length}
                     onCheckedChange={toggleSelectAll}
-                    className="border-white/20 data-[state=checked]:bg-slate-100 data-[state=checked]:text-slate-900"
+                    className="border-slate-300 dark:border-white/20 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                   />
                 </th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Date Created</th>
@@ -219,11 +219,13 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 relative">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5 relative">
               {isFetching && (
-                <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[1px] flex items-center justify-center z-20">
-                  <Loader className="h-8 w-8 animate-spin text-slate-400" />
-                </div>
+                <tr className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+                  <td colSpan={8} className="bg-white/20 dark:bg-slate-950/20 backdrop-blur-[1px] flex items-center justify-center h-full w-full border-none">
+                    <Loader className="h-8 w-8 animate-spin text-slate-500 dark:text-slate-400" />
+                  </td>
+                </tr>
               )}
               
               {transactions.length === 0 && !isFetching ? (
@@ -236,7 +238,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                 transactions.map((tx) => (
                   <tr 
                     key={tx._id || tx.id}
-                    className="hover:bg-white/[0.03] transition-colors group cursor-default"
+                    className="hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group cursor-default"
                   >
                     <td className="px-6 py-4">
                       <Checkbox
@@ -250,7 +252,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white">{tx.title}</span>
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">{tx.title}</span>
                         {tx.isRecurring && (
                            <div className="flex items-center gap-1 mt-1">
                                <RefreshCw className="h-3 w-3 text-indigo-400" />
@@ -260,7 +262,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-xs text-slate-300 bg-white/5 px-2 py-1 rounded-md capitalize">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md capitalize">
                         {tx.category}
                       </span>
                     </td>
@@ -285,7 +287,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                       <div className="flex items-center gap-2 text-slate-400 text-sm">
+                       <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                           <CreditCard className="h-3.5 w-3.5 opacity-50" />
                           <span className="capitalize">{tx.paymentMethod?.replace("_", " ")?.toLowerCase()}</span>
                        </div>
@@ -305,7 +307,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
         </div>
 
         {/* MOBILE CARD VIEW */}
-        <div className="md:hidden divide-y divide-white/5">
+        <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
            {isFetching && transactions.length === 0 && (
              <div className="py-20 flex justify-center">
                <Loader className="h-8 w-8 animate-spin text-slate-500" />
@@ -317,19 +319,19 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
              </div>
            )}
            {transactions.map((tx) => (
-             <div 
-               key={tx._id || tx.id} 
-               className="p-5 space-y-4 hover:bg-white/[0.02] bg-white/[0.01] transition-colors relative group"
-             >
+              <div 
+                key={tx._id || tx.id} 
+                className="p-5 space-y-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] bg-white dark:bg-white/[0.01] transition-colors relative group"
+              >
                <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                     <Checkbox
+                      <Checkbox
                         checked={selectedRows.includes(tx._id || tx.id)}
                         onCheckedChange={() => toggleSelectRow(tx._id || tx.id)}
-                        className="mt-1 border-white/20 data-[state=checked]:bg-slate-100 data-[state=checked]:text-slate-900"
+                        className="mt-1 border-slate-300 dark:border-white/20 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                       />
                       <div className="space-y-1">
-                        <h4 className="text-sm font-bold text-white leading-tight">{tx.title}</h4>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{tx.title}</h4>
                         <div className="flex items-center gap-2">
                           <Badge className={cn(
                             "px-2 py-0 h-4 text-[9px] font-black uppercase",
@@ -354,8 +356,8 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
 
                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Category</span>
-                    <span className="text-xs text-slate-300 capitalize">{tx.category}</span>
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Category</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-300 capitalize">{tx.category}</span>
                   </div>
                   <div className="space-y-1 text-right">
                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Amount</span>
@@ -368,16 +370,16 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Transaction Date</span>
-                    <div className="flex items-center gap-1.5 text-slate-400">
-                       <Calendar className="h-3 w-3 opacity-60" />
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Transaction Date</span>
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                       <Calendar className="h-3 w-3 opacity-70 dark:opacity-60" />
                        <span className="text-xs">{format(new Date(tx.date), "MMM dd, yyyy")}</span>
                     </div>
                   </div>
                   <div className="space-y-1 text-right">
-                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Payment</span>
-                    <div className="flex items-center justify-end gap-1.5 text-slate-400">
-                       <CreditCard className="h-3 w-3 opacity-60" />
+                    <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Payment</span>
+                    <div className="flex items-center justify-end gap-1.5 text-slate-500 dark:text-slate-400">
+                       <CreditCard className="h-3 w-3 opacity-70 dark:opacity-60" />
                        <span className="text-xs capitalize">{tx.paymentMethod?.replace("_", " ")?.toLowerCase()}</span>
                     </div>
                   </div>
@@ -397,9 +399,9 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
 
         {/* PAGINATION */}
         {isShowPagination && pagination.totalPages > 1 && (
-          <div className="px-6 py-5 border-t border-white/5 bg-white/[0.02] flex items-center justify-between">
-             <span className="text-xs text-slate-500">
-               Page <span className="text-white">{pagination.pageNumber}</span> of {pagination.totalPages}
+          <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/[0.02] flex items-center justify-between">
+             <span className="text-xs text-slate-500 dark:text-slate-500">
+               Page <span className="text-slate-900 dark:text-white">{pagination.pageNumber}</span> of {pagination.totalPages}
              </span>
              <div className="flex items-center gap-2">
                 <Button
@@ -407,7 +409,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                   size="sm"
                   disabled={pagination.pageNumber === 1 || isFetching}
                   onClick={() => setFilter(p => ({ ...p, pageNumber: p.pageNumber - 1 }))}
-                  className="h-9 w-9 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg"
+                  className="h-9 w-9 p-0 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -423,8 +425,8 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                             className={cn(
                               "h-8 w-8 text-[11px] font-bold rounded-lg transition-all",
                               pagination.pageNumber === pNum 
-                                ? "bg-white text-slate-950 shadow-lg shadow-white/10" 
-                                : "text-slate-500 hover:text-white hover:bg-white/5"
+                                ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg shadow-slate-200 dark:shadow-white/10" 
+                                : "text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                             )}
                           >
                             {pNum}
@@ -442,7 +444,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                   size="sm"
                   disabled={pagination.pageNumber === pagination.totalPages || isFetching}
                   onClick={() => setFilter(p => ({ ...p, pageNumber: p.pageNumber + 1 }))}
-                  className="h-9 w-9 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg"
+                  className="h-9 w-9 p-0 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -457,26 +459,26 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
 const DropdownAction = ({ tx, onAction, isLoading }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg">
+      <Button variant="ghost" className="h-8 w-8 p-0 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg">
         <MoreVertical className="h-4 w-4" />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-48 bg-slate-900 border-white/10 shadow-2xl p-1.5 rounded-xl">
+    <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 shadow-xl dark:shadow-2xl p-1.5 rounded-xl">
       <DropdownMenuItem 
         onClick={() => onAction("edit", tx._id || tx.id)}
-        className="flex items-center gap-3 py-2.5 px-3 focus:bg-white/10 focus:text-white rounded-lg cursor-pointer transition-colors"
+        className="flex items-center gap-3 py-2.5 px-3 focus:bg-slate-100 dark:focus:bg-white/10 text-slate-700 dark:text-slate-300 focus:text-slate-900 dark:focus:text-white rounded-lg cursor-pointer transition-colors"
       >
         <Pencil className="h-4 w-4" />
         <span className="text-sm font-medium">Edit Transaction</span>
       </DropdownMenuItem>
       <DropdownMenuItem 
         onClick={() => onAction("duplicate", tx._id || tx.id)}
-        className="flex items-center gap-3 py-2.5 px-3 focus:bg-white/10 focus:text-white rounded-lg cursor-pointer transition-colors"
+        className="flex items-center gap-3 py-2.5 px-3 focus:bg-slate-100 dark:focus:bg-white/10 text-slate-700 dark:text-slate-300 focus:text-slate-900 dark:focus:text-white rounded-lg cursor-pointer transition-colors"
       >
         <Copy className="h-4 w-4" />
         <span className="text-sm font-medium">Duplicate</span>
       </DropdownMenuItem>
-      <DropdownMenuSeparator className="bg-white/5 my-1" />
+      <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/5 my-1" />
       <DropdownMenuItem 
         onClick={() => onAction("delete", tx._id || tx.id)}
         className="flex items-center gap-3 py-2.5 px-3 focus:bg-rose-500/20 text-rose-500 focus:text-rose-400 rounded-lg cursor-pointer transition-colors"
