@@ -43,7 +43,7 @@ const ExpensePieChart = (props) => {
                             data: categories, dataKey: "value", nameKey: "name", innerRadius: 60, outerRadius: 80, paddingAngle: 2, strokeWidth: 2, stroke: "#fff", children: [categories.map((_, index) => (_jsx(Cell, { fill: COLORS[index % COLORS.length] }, `cell-${index}`))), _jsx(Label, {
                                 content: ({ viewBox }) => {
                                     if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                        return (_jsxs("text", { x: viewBox.cx, y: viewBox.cy, textAnchor: "middle", dominantBaseline: "middle", children: [_jsxs("tspan", { x: viewBox.cx, y: viewBox.cy, className: "fill-foreground text-2xl font-bold", children: ["$", totalSpent.toLocaleString()] }), _jsx("tspan", { x: viewBox.cx, y: (viewBox.cy || 0) + 20, className: "fill-muted-foreground text-xs", children: "Total Spent" })] }));
+                                        return (_jsxs("text", { x: viewBox.cx, y: viewBox.cy, textAnchor: "middle", dominantBaseline: "middle", children: [_jsxs("tspan", { x: viewBox.cx, y: viewBox.cy, className: "fill-foreground text-2xl font-bold", children: ["₹", totalSpent.toLocaleString()] }), _jsx("tspan", { x: viewBox.cx, y: (viewBox.cy || 0) + 20, className: "fill-muted-foreground text-xs", children: "Total Spent" })] }));
                                     }
                                 }
                             })]
