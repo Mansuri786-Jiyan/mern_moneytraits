@@ -29,7 +29,7 @@ export const createTransactionService = async (body, userId) => {
 };
 
 export const getAllTransactionService = async (userId, filters, pagination) => {
-    const { keyword, type, recurringStatus } = filters;
+    const { keyword, type, recurringStatus, category } = filters;
     const filterConditions = {
         userId,
     };
@@ -41,6 +41,9 @@ export const getAllTransactionService = async (userId, filters, pagination) => {
     }
     if (type) {
         filterConditions.type = type;
+    }
+    if (category) {
+        filterConditions.category = { $regex: `^${category}$`, $options: "i" };
     }
     if (recurringStatus) {
         if (recurringStatus === "RECURRING") {

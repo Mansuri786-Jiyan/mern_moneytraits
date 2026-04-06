@@ -46,6 +46,7 @@ import {
   useDeleteTransactionMutation,
   useDuplicateTransactionMutation,
 } from "@/features/transaction/transactionAPI";
+import { useGetCategoriesQuery } from "@/features/category/categoryAPI";
 import { toast } from "sonner";
 import useEditTransactionDrawer from "@/hooks/use-edit-transaction-drawer";
 
@@ -53,6 +54,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
   const [filter, setFilter] = useState({
     type: undefined,
     recurringStatus: undefined,
+    category: undefined,
     pageNumber: 1,
     pageSize: pageSize,
   });
@@ -65,10 +67,14 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
   const [deleteTransaction, { isLoading: isDeleting }] = useDeleteTransactionMutation();
   const [bulkDeleteTransaction, { isLoading: isBulkDeleting }] = useBulkDeleteTransactionMutation();
 
+  const { data: categoriesData } = useGetCategoriesQuery();
+  const allCategories = categoriesData?.categories || [];
+
   const { data, isFetching } = useGetAllTransactionsQuery({
     keyword,
     type: filter.type,
     recurringStatus: filter.recurringStatus,
+    category: filter.category,
     pageNumber: filter.pageNumber,
     pageSize: filter.pageSize,
   });
@@ -87,8 +93,9 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
       keyword,
       type: filter.type,
       recurringStatus: filter.recurringStatus,
+      category: filter.category,
     });
-  }, [keyword, filter.type, filter.recurringStatus, onFiltersChange]);
+  }, [keyword, filter.type, filter.recurringStatus, filter.category, onFiltersChange]);
 
   const toggleSelectAll = () => {
     if (selectedRows.length === transactions.length) {
@@ -178,6 +185,32 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
               <SelectItem value="ALL">All Frequency</SelectItem>
               <SelectItem value="RECURRING">Recurring</SelectItem>
               <SelectItem value="NON_RECURRING">One-time</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Category Filter */}
+          <Select
+            value={filter.category || "ALL"}
+            onValueChange={(val) => setFilter(p => ({ ...p, category: val === "ALL" ? undefined : val, pageNumber: 1 }))}
+          >
+            <SelectTrigger className="h-11 w-[160px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 max-h-[280px]">
+              <SelectItem value="ALL">All Categories</SelectItem>
+              {allCategories.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  <div className="flex items-center gap-2">
+                    {cat.color && (
+                      <span
+                        className="inline-block w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                    )}
+                    <span className="capitalize">{cat.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

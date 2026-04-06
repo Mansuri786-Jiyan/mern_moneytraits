@@ -73,6 +73,10 @@ export const emailReportController = asyncHandler(async (req, res) => {
 
     const fromDate = new Date(from);
     const toDate = new Date(to);
+
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        return res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "Invalid date format provided." });
+    }
     
     const result = await generateReportService(userId, fromDate, toDate);
 

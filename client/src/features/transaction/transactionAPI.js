@@ -18,7 +18,7 @@ export const transactionApi = apiClient.injectEndpoints({
         }),
         getAllTransactions: builder.query({
             query: (params) => {
-                const { keyword = undefined, type = undefined, recurringStatus = undefined, pageNumber = 1, pageSize = 10, } = params;
+                const { keyword = undefined, type = undefined, recurringStatus = undefined, category = undefined, pageNumber = 1, pageSize = 10, } = params;
                 return {
                     url: "/transaction/all",
                     method: "GET",
@@ -26,6 +26,7 @@ export const transactionApi = apiClient.injectEndpoints({
                         keyword,
                         type,
                         recurringStatus,
+                        category,
                         pageNumber,
                         pageSize,
                     },

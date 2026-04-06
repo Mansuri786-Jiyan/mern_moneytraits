@@ -20,6 +20,8 @@ import { Switch } from "../ui/switch.jsx";
 import CurrencyInputField from "../ui/currency-input.jsx";
 import { SingleSelector } from "../ui/single-select.jsx";
 import { useCreateTransactionMutation, useGetSingleTransactionQuery, useUpdateTransactionMutation, useSuggestCategoryMutation, } from "@/features/transaction/transactionAPI";
+import { useGetCategoriesQuery } from "@/features/category/categoryAPI";
+import ManageCategoriesDialog from "./manage-categories-dialog.jsx";
 import { toast } from "sonner";
 const formSchema = z.object({
     title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -60,6 +62,8 @@ const TransactionForm = (props) => {
     const editData = data?.transaction;
     const [createTransaction, { isLoading: isCreating }] = useCreateTransactionMutation();
     const [updateTransaction, { isLoading: isUpdating }] = useUpdateTransactionMutation();
+    const { data: categoriesData, isLoading: isLoadingCategories } = useGetCategoriesQuery();
+    
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -75,6 +79,19 @@ const TransactionForm = (props) => {
             receiptUrl: "",
         },
     });
+
+    // Use dynamic categories from API, fallback to static CATEGORIES constant
+    const currentType = form.watch("type");
+    const apiCategories = categoriesData?.categories || [];
+    const baseCategories = apiCategories.length > 0 ? apiCategories : CATEGORIES;
+    const filteredCategories = baseCategories.filter(cat => {
+        // isSystem=true → system default (always show)
+        // isSystem=false → user custom (filter by type)
+        // isSystem=undefined → from CATEGORIES constant (always show)
+        if (cat.isSystem === false) return cat.type === currentType;
+        return true;
+    });
+
     useEffect(() => {
         if (isEdit && transactionId && editData) {
             form.reset({
@@ -91,9 +108,10 @@ const TransactionForm = (props) => {
         }
     }, [editData, form, isEdit, transactionId]);
 
-    const suggestTimeoutRefValue = useEffect(() => {
+    useEffect(() => {
         return () => clearTimeout(timeoutRef?.current);
     }, []);
+
     const frequencyOptions = Object.entries(_TRANSACTION_FREQUENCY).map(
     ([_, value]) => ({
         value: value,
@@ -186,15 +204,14 @@ const TransactionForm = (props) => {
                                                     } }), isSuggesting && (_jsx("div", { className: "absolute right-3 top-1/2 -translate-y-1/2", children: _jsx(Loader, { className: "h-3.5 w-3.5 animate-spin text-muted-foreground" }) }))] }) }), suggestion && !form.watch("category") && (_jsxs("div", { className: "flex items-center gap-2 mt-1.5 animate-in fade-in slide-in-from-top-1", children: [_jsx("span", { className: "text-xs text-muted-foreground", children: "AI suggests:" }), _jsxs("button", { type: "button", onClick: () => {
                                                             form.setValue("category", suggestion.category);
                                                             setSuggestion(null);
-                                                        }, className: "flex items-center gap-1.5 px-2.5 py-1\r\n                                rounded-full border border-primary/30 bg-primary/5\r\n                                text-primary text-xs font-medium hover:bg-primary/10\r\n                                transition-colors cursor-pointer", children: [_jsx(Sparkles, { className: "h-3 w-3" }), _jsx("span", { className: "capitalize", children: suggestion.category }), _jsxs("span", { className: "text-primary/60", children: ["(", suggestion.confidence, "%)"] })] }), _jsx("button", { type: "button", onClick: () => setSuggestion(null), className: "text-xs text-muted-foreground hover:text-foreground", children: "dismiss" })] })), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "amount", render: ({ field }) => (_jsxs(FormItem, { children: [_jsx(FormLabel, { children: "Amount" }), _jsx(FormControl, { children: _jsx("div", { className: "relative", children: _jsx(CurrencyInputField, { ...field, disabled: isScanning, onValueChange: (value) => field.onChange(value || ""), placeholder: "\u20B90.00", prefix: "\u20B9" }) }) }), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "category", render: ({ field }) => (_jsxs(FormItem, { children: [_jsx(FormLabel, { children: "Category" }), _jsx(SingleSelector, { value: CATEGORIES.find((opt) => opt.value === field.value) ||
+                                                        }, className: "flex items-center gap-1.5 px-2.5 py-1\r\n                                rounded-full border border-primary/30 bg-primary/5\r\n                                text-primary text-xs font-medium hover:bg-primary/10\r\n                                transition-colors cursor-pointer", children: [_jsx(Sparkles, { className: "h-3 w-3" }), _jsx("span", { className: "capitalize", children: suggestion.category }), _jsxs("span", { className: "text-primary/60", children: ["(", suggestion.confidence, "%)"] })] }), _jsx("button", { type: "button", onClick: () => setSuggestion(null), className: "text-xs text-muted-foreground hover:text-foreground", children: "dismiss" })] })), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "amount", render: ({ field }) => (_jsxs(FormItem, { children: [_jsx(FormLabel, { children: "Amount" }), _jsx(FormControl, { children: _jsx("div", { className: "relative", children: _jsx(CurrencyInputField, { ...field, disabled: isScanning, onValueChange: (value) => field.onChange(value || ""), placeholder: "\u20B90.00", prefix: "\u20B9" }) }) }), _jsx(FormMessage, {})] })) }), _jsxs("div", { className: "flex items-end gap-2", children: [_jsx(FormField, { control: form.control, name: "category", render: ({ field }) => (_jsxs(FormItem, { className: "flex-1", children: [_jsx(FormLabel, { children: "Category" }), _jsx(SingleSelector, { value: filteredCategories.find((opt) => opt.value === field.value) ||
                                                 field.value
                                                 ? { value: field.value, label: field.value }
                                                 : undefined, onChange: (option) => {
                                                 field.onChange(option.value);
                                                 setSuggestion(null);
-                                            }, options: CATEGORIES, placeholder: "Select or type a category", creatable: true, disabled: isScanning }), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "date", render: ({ field }) => (_jsxs(FormItem, { className: "flex flex-col", children: [_jsx(FormLabel, { children: "Date" }), _jsxs(Popover, { modal: false, children: [_jsx(PopoverTrigger, { asChild: true, children: _jsx(FormControl, { children: _jsxs(Button, { variant: "outline", className: cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground"), children: [field.value ? (format(field.value, "PPP")) : (_jsx("span", { children: "Pick a date" })), _jsx(Calendar, { className: "ml-auto h-4 w-4 opacity-50" })] }) }) }), _jsx(PopoverContent, { className: "w-auto p-0 !pointer-events-auto", align: "start", children: _jsx(CalendarComponent, { mode: "single", selected: field.value, onSelect: (date) => {
-                                                            console.log(date);
-                                                            field.onChange(date); // This updates the form value
+                                            }, options: filteredCategories, placeholder: "Select or type a category", creatable: true, disabled: isScanning || isLoadingCategories }), _jsx(FormMessage, {})] })) }), _jsx(ManageCategoriesDialog, {})] }), _jsx(FormField, { control: form.control, name: "date", render: ({ field }) => (_jsxs(FormItem, { className: "flex flex-col", children: [_jsx(FormLabel, { children: "Date" }), _jsxs(Popover, { modal: false, children: [_jsx(PopoverTrigger, { asChild: true, children: _jsx(FormControl, { children: _jsxs(Button, { variant: "outline", className: cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground"), children: [field.value ? (format(field.value, "PPP")) : (_jsx("span", { children: "Pick a date" })), _jsx(Calendar, { className: "ml-auto h-4 w-4 opacity-50" })] }) }) }), _jsx(PopoverContent, { className: "w-auto p-0 !pointer-events-auto", align: "start", children: _jsx(CalendarComponent, { mode: "single", selected: field.value, onSelect: (date) => {
+                                                            field.onChange(date);
                                                         }, disabled: (date) => date < new Date("2023-01-01"), initialFocus: true }) })] }), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "paymentMethod", render: ({ field }) => (_jsxs(FormItem, { children: [_jsx(FormLabel, { children: "Payment Method" }), _jsxs(Select, { onValueChange: field.onChange, value: field.value, disabled: isScanning, children: [_jsx(FormControl, { className: "w-full", children: _jsx(SelectTrigger, { children: _jsx(SelectValue, { placeholder: "Select payment method" }) }) }), _jsx(SelectContent, { children: PAYMENT_METHODS.map((method) => (_jsx(SelectItem, { value: method.value, children: method.label }, method.value))) })] }), _jsx(FormMessage, {})] })) }), _jsx(FormField, { control: form.control, name: "isRecurring", render: ({ field }) => (_jsxs(FormItem, { className: "flex flex-row items-center justify-between rounded-lg border p-4", children: [_jsxs("div", { className: "space-y-0.5", children: [_jsx(FormLabel, { className: "text-[14.5px]", children: "Recurring Transaction" }), _jsx("p", { className: "text-xs text-muted-foreground", children: field.value
                                                         ? "This will repeat automatically"
                                                         : "Set recurring to repeat this transaction" })] }), _jsx(FormControl, { children: _jsx(Switch, { disabled: isScanning, checked: field.value, className: "cursor-pointer", onCheckedChange: (checked) => {

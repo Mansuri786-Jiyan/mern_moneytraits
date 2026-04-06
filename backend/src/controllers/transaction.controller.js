@@ -20,6 +20,7 @@ export const getAllTransactionController = asyncHandler(async (req, res) => {
         keyword: req.query.keyword,
         type: req.query.type,
         recurringStatus: req.query.recurringStatus,
+        category: req.query.category,
     };
     const pagination = {
         pageSize: parseInt(req.query.pageSize) || 20,
