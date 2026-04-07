@@ -240,7 +240,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                   <Checkbox
                     checked={selectedRows.length > 0 && selectedRows.length === transactions.length}
                     onCheckedChange={toggleSelectAll}
-                    className="border-slate-300 dark:border-white/20 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
+                    className="border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                   />
                 </th>
                 <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Date Created</th>
@@ -277,7 +277,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                       <Checkbox
                         checked={selectedRows.includes(tx._id || tx.id)}
                         onCheckedChange={() => toggleSelectRow(tx._id || tx.id)}
-                        className="border-white/20 data-[state=checked]:bg-slate-100 data-[state=checked]:text-slate-900"
+                        className="border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                       />
                     </td>
                     <td className="px-6 py-4 text-sm text-slate-400">
@@ -361,7 +361,7 @@ const PremiumTransactionTable = ({ pageSize = 10, isShowPagination = true, onFil
                       <Checkbox
                         checked={selectedRows.includes(tx._id || tx.id)}
                         onCheckedChange={() => toggleSelectRow(tx._id || tx.id)}
-                        className="mt-1 border-slate-300 dark:border-white/20 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
+                        className="mt-1 border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
                       />
                       <div className="space-y-1">
                         <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{tx.title}</h4>

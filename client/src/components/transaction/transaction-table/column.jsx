@@ -14,8 +14,8 @@ import { toast } from "sonner";
 export const transactionColumns = [
     {
         id: "select",
-        header: ({ table }) => (_jsx(Checkbox, { className: "!border-black data-[state=checked]:!bg-gray-800 !text-white", checked: table.getIsAllPageRowsSelected(), onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value), "aria-label": "Select all" })),
-        cell: ({ row }) => (_jsx(Checkbox, { className: "!border-black data-[state=checked]:!bg-gray-800 !text-white", checked: row.getIsSelected(), onCheckedChange: (value) => row.toggleSelected(!!value), "aria-label": "Select row" })),
+        header: ({ table }) => (_jsx(Checkbox, { className: "border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900", checked: table.getIsAllPageRowsSelected(), onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value), "aria-label": "Select all" })),
+        cell: ({ row }) => (_jsx(Checkbox, { className: "border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900", checked: row.getIsSelected(), onCheckedChange: (value) => row.toggleSelected(!!value), "aria-label": "Select row" })),
         enableSorting: false,
         enableHiding: false,
     },
