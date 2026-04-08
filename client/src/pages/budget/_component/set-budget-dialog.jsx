@@ -53,9 +53,10 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
   useEffect(() => {
     if (editData) {
       form.reset({
-        category: editData.category,
-        limitAmount: editData.limitAmount.toString(),
+        category: editData.category || "",
+        limitAmount: editData.limitAmount?.toString() || "",
       });
+
     } else {
       form.reset({ category: "", limitAmount: "" });
     }
@@ -110,10 +111,11 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
                     </FormControl>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat.name}>
-                          {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
+                        <SelectItem key={cat._id} value={cat.name || "unnamed"}>
+                          {cat.name ? (cat.name.charAt(0).toUpperCase() + cat.name.slice(1)) : "Unnamed"}
                         </SelectItem>
                       ))}
+
                     </SelectContent>
                   </Select>
                   <FormMessage />
