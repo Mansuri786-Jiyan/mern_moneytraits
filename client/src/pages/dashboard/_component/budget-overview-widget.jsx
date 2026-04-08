@@ -49,7 +49,8 @@ const BudgetOverviewWidget = () => {
     .sort((a, b) => b.percentage - a.percentage)
     .slice(0, 3);
 
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
 
   const getProgressColor = (pct) => {
     if (pct >= 100) return "[&>div]:bg-red-500";
@@ -68,7 +69,6 @@ const BudgetOverviewWidget = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-lg">Budget overview</CardTitle>
-          <CardDescription>This month's top spending categories</CardDescription>
         </div>
         <CardAction>
           <Link
@@ -81,7 +81,7 @@ const BudgetOverviewWidget = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          {topBudgets.map((budget) => (
+          {topBudgets.slice(0, 1).map((budget) => (
             <div key={budget._id} className="space-y-1">
               <div className="flex justify-between items-center text-sm">
                 <span className="font-medium">{capitalize(budget.category)}</span>

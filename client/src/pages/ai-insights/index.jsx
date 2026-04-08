@@ -19,7 +19,13 @@ import {
 } from "@/features/analytics/analyticsAPI";
 import { useGetBudgetSummaryQuery } from "@/features/budget/budgetAPI";
 import { useSendChatMessageMutation } from "@/features/chatbot/chatbotAPI";
-import { useTypedSelector } from "@/app/hook";
+import { useAppDispatch, useTypedSelector } from "@/app/hook";
+import { toast } from "sonner";
+import { apiClient } from "@/app/api-client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+
 import PageLayout from "@/components/page-layout";
 import FinancialHealthScore from "@/pages/dashboard/_component/financial-health-score";
 import SpendingForecast from "@/pages/dashboard/_component/spending-forecast";
@@ -69,7 +75,9 @@ export default function AIInsights() {
   const [isLoadingSummary, setIsLoadingSummary] = useState(true);
   const messagesEndRef = useRef(null);
 
+  const dispatch = useAppDispatch();
   const { user } = useTypedSelector((state) => state.auth);
+
 
   const { data: summaryResponse, isFetching: isSummaryLoading } =
     useSummaryAnalyticsQuery({
@@ -144,6 +152,24 @@ export default function AIInsights() {
           timestamp: new Date(),
         },
       ]);
+
+      if (result.data?.actionPerformed) {
+        toast.success("Action performed successfully!", {
+          description: `AI ${result.data?.actionDetails?.type?.replace("_", " ").toLowerCase()}`,
+        });
+        
+        // Refresh all relevant data
+        dispatch(
+          apiClient.util.invalidateTags([
+            "transactions",
+            "analytics",
+            "forecast",
+            "budgets",
+            "Goals",
+          ])
+        );
+      }
+
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -452,26 +478,42 @@ export default function AIInsights() {
                       <Sparkles className="h-3.5 w-3.5 text-white" />
                     </div>
                   )}
-                  <div
-                    className={cn(
-                      "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm",
-                      msg.role === "user"
-                        ? "bg-primary text-white rounded-br-sm"
-                        : "bg-muted text-foreground rounded-bl-sm"
-                    )}
-                  >
-                    {msg.content}
-                    <p
+                    <div
                       className={cn(
-                        "text-[10px] mt-1",
+                        "max-w-[75%] rounded-2xl px-4 py-2.5 text-sm",
                         msg.role === "user"
-                          ? "text-white/60 text-right"
-                          : "text-muted-foreground"
+                          ? "bg-primary text-white rounded-br-sm"
+                          : "bg-muted text-foreground rounded-bl-sm"
                       )}
                     >
-                      {format(new Date(msg.timestamp), "HH:mm")}
-                    </p>
-                  </div>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          ul: ({ ...props }) => (
+                            <ul className="list-disc ml-4 space-y-1 mb-2" {...props} />
+                          ),
+                          ol: ({ ...props }) => (
+                            <ol className="list-decimal ml-4 space-y-1 mb-2" {...props} />
+                          ),
+                          li: ({ ...props }) => <li className="marker:text-muted-foreground" {...props} />,
+                          p: ({ ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                          strong: ({ ...props }) => <strong className="font-bold text-inherit" {...props} />,
+                          h3: ({ ...props }) => <h3 className="text-base font-bold mb-2 mt-3" {...props} />,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                      <p
+                        className={cn(
+                          "text-[10px] mt-1",
+                          msg.role === "user"
+                            ? "text-white/60 text-right"
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        {format(new Date(msg.timestamp), "HH:mm")}
+                      </p>
+                    </div>
                 </div>
               ))}
 

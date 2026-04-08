@@ -31,7 +31,12 @@ const SignInForm = ({ className, ...props }) => {
   const [login, { isLoading }] = useLoginMutation();
   const form = useForm({
     resolver: zodResolver(schema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
+
 
   const onSubmit = (values) => {
     login(values)

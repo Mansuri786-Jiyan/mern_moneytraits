@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")).render(
           <App />
         </NuqsAdapter>
         <Toaster
-          position="top-center"
+          position="top-right"
           expand
           duration={5000}
           richColors

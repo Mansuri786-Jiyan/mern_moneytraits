@@ -21,7 +21,8 @@ const BudgetCard = ({ budget, onEdit, onDelete, isDeleting }) => {
   const { category, limitAmount, spent, remaining, percentage, isOverBudget } =
     budget;
 
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
 
   const getProgressColor = (pct) => {
     if (pct >= 100) return "[&>div]:bg-red-500";
