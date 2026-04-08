@@ -27,9 +27,8 @@ import categoryRoutes from "./routes/category.route.js";
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
 
-// CORS configuration
-const allowedOrigins = [
-  "http://localhost:5173",
+// CORS configuration — allow all localhost ports for local dev, plus production origins
+const productionOrigins = [
   "https://mern-moneytraits-gtwj.vercel.app",
   "https://mern-moneytraits.vercel.app",
   Env.FRONTEND_ORIGIN,
@@ -37,27 +36,35 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow server-to-server requests (no origin header)
     if (!origin) return callback(null, true);
-    
-    const normalizedOrigin = origin.trim().replace(/\/$/, "");
-    const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
-                     normalizedOrigin.endsWith(".vercel.app"); // Optional: Allow all Vercel previews
 
-    if (isAllowed) {
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+
+    // Allow ALL localhost ports for local development
+    const isLocalhost = normalizedOrigin.startsWith("http://localhost:") ||
+                        normalizedOrigin.startsWith("http://127.0.0.1:");
+
+    // Allow all Vercel deployments (covers preview URLs too)
+    const isVercel = normalizedOrigin.endsWith(".vercel.app");
+
+    // Allow explicitly listed production origins
+    const isProduction = productionOrigins.includes(normalizedOrigin);
+
+    if (isLocalhost || isVercel || isProduction) {
       callback(null, true);
     } else {
-      console.log(`CORS Blocked: ${origin}. Allowed:`, allowedOrigins);
+      console.log(`CORS Blocked: ${origin}`);
       callback(new Error(`CORS not allowed for origin: ${origin}`));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: [
-    "Content-Type", 
-    "Authorization", 
-    "X-Requested-With", 
-    "Accept", 
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
     "Origin",
-    "Access-Control-Allow-Origin"
   ],
   credentials: true,
   preflightContinue: false,
