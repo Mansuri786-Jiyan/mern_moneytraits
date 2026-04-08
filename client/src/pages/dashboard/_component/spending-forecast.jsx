@@ -1,13 +1,13 @@
 import React from "react";
 import { useGetForecastQuery } from "@/features/analytics/analyticsAPI";
 import { formatCurrency } from "@/lib/format-currency";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
   CardTitle,
-  CardAction
+  CardAction,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +23,6 @@ import {
   ResponsiveContainer,
   Cell,
   Tooltip,
-  Area
 } from "recharts";
 
 const TrendIndicator = ({ trend }) => {
@@ -44,9 +43,16 @@ const CustomTooltip = ({ active, payload, label }) => {
     const data = payload[0].payload;
     return (
       <div className="bg-white dark:bg-card border border-border/60 p-3 rounded-xl shadow-xl backdrop-blur-md">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+          {label}
+        </p>
         <div className="flex items-center gap-2">
-          <div className={cn("w-2 h-2 rounded-full", data.isForecast ? "bg-[#8b5cf6]" : "bg-[#22c55e]")} />
+          <div
+            className={cn(
+              "w-2 h-2 rounded-full",
+              data.isForecast ? "bg-[#8b5cf6]" : "bg-[#22c55e]"
+            )}
+          />
           <p className="text-sm font-bold">{formatCurrency(data.amount)}</p>
         </div>
         <p className="text-[10px] text-muted-foreground mt-1 font-medium">
@@ -65,13 +71,15 @@ const SpendingForecast = () => {
   const monthlyHistory = forecastData?.monthlyHistory || [];
 
   // Prepare chart data: Ensure at least 3-6 months, fill 0s, oldest first
-  const sortedHistory = [...monthlyHistory].sort((a, b) => new Date(a.month) - new Date(b.month));
-  
-  const chartData = sortedHistory.map(h => ({
-    name: h.month.split(' ')[0], // Only month name
+  const sortedHistory = [...monthlyHistory].sort(
+    (a, b) => new Date(a.month) - new Date(b.month)
+  );
+
+  const chartData = sortedHistory.map((h) => ({
+    name: h.month.split(" ")[0], // Only month name
     fullName: h.month,
     amount: Object.values(h.categories).reduce((a, b) => a + Number(b), 0),
-    isForecast: false
+    isForecast: false,
   }));
 
   // Ensure minimum 3 months of history for visual balance if available
@@ -81,13 +89,13 @@ const SpendingForecast = () => {
       name: "Predicted",
       fullName: forecastData.forecastMonth,
       amount: forecastData.totalPredicted,
-      isForecast: true
+      isForecast: true,
     });
   }
 
   // Define colors
   const ACTUAL_COLOR = "#22c55e"; // Green
-  const FORECAST_COLOR = "#8b5cf6"; // Purple 
+  const FORECAST_COLOR = "#8b5cf6"; // Purple
 
   if (isFetching) {
     return (
@@ -122,7 +130,8 @@ const SpendingForecast = () => {
         <CardContent>
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">
-              Limited data available. Add more transactions for better predictions.
+              Limited data available. Add more transactions for better
+              predictions.
             </p>
           </div>
         </CardContent>
@@ -147,26 +156,44 @@ const SpendingForecast = () => {
           </Badge>
         </CardAction>
       </CardHeader>
-      
+
       <CardContent className="space-y-6 pt-6">
         {/* Premium Chart */}
         <div className="space-y-2">
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">Spending Trend (Past vs Forecast)</p>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest pl-1">
+            Spending Trend (Past vs Forecast)
+          </p>
           <div className="h-[220px] w-full relative">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <ComposedChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
                 <defs>
                   <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.8}/>
-                    <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.2}/>
+                    <stop
+                      offset="0%"
+                      stopColor="var(--primary)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="var(--primary)"
+                      stopOpacity={0.2}
+                    />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" opacity={0.3} />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  fontSize={10} 
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="var(--border)"
+                  opacity={0.3}
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  fontSize={10}
                   fontWeight={600}
                   tickMargin={12}
                   className="fill-muted-foreground"
@@ -175,25 +202,33 @@ const SpendingForecast = () => {
                   axisLine={false}
                   tickLine={false}
                   fontSize={10}
-                  tickFormatter={(val) => `₹${val/1000}k`}
+                  tickFormatter={(val) => `₹${val / 1000}k`}
                   className="fill-muted-foreground"
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
-                
-                <Bar dataKey="amount" barSize={35} radius={[6, 6, 0, 0]} animationDuration={1500}>
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "var(--muted)", opacity: 0.1 }}
+                />
+
+                <Bar
+                  dataKey="amount"
+                  barSize={35}
+                  radius={[6, 6, 0, 0]}
+                  animationDuration={1500}
+                >
                   {chartData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
+                    <Cell
+                      key={`cell-${index}`}
                       fill={entry.isForecast ? FORECAST_COLOR : ACTUAL_COLOR}
                       fillOpacity={entry.isForecast ? 0.8 : 0.7}
                     />
                   ))}
                 </Bar>
-                
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
-                  stroke="var(--primary)" 
+
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="var(--primary)"
                   strokeWidth={2.5}
                   dot={{ r: 4, strokeWidth: 2, fill: "var(--background)" }}
                   activeDot={{ r: 6, strokeWidth: 2, fill: "var(--primary)" }}
@@ -206,18 +241,34 @@ const SpendingForecast = () => {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="p-4 rounded-2xl bg-muted/20 border border-border/30 group hover:border-primary/30 transition-all duration-300">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold opacity-70">Predicted Total</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold opacity-70">
+              Predicted Total
+            </p>
             <p className="text-2xl font-black text-foreground mt-1 group-hover:scale-105 transition-transform origin-left">
               {formatCurrency(forecastData.totalPredicted)}
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-muted/20 border border-border/30 group hover:border-primary/30 transition-all duration-300">
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold opacity-70">vs Last Month</p>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold opacity-70">
+              vs Last Month
+            </p>
             <div className="flex items-center gap-2 mt-1 group-hover:scale-105 transition-transform origin-left">
-              <TrendIndicator trend={diff > 0 ? "increase" : diff < 0 ? "decrease" : "stable"} />
-              <p className={cn("text-2xl font-black", 
-                diff > 0 ? "text-red-500" : diff < 0 ? "text-green-500" : "text-foreground")}>
+              <TrendIndicator
+                trend={
+                  diff > 0 ? "increase" : diff < 0 ? "decrease" : "stable"
+                }
+              />
+              <p
+                className={cn(
+                  "text-2xl font-black",
+                  diff > 0
+                    ? "text-red-500"
+                    : diff < 0
+                    ? "text-green-500"
+                    : "text-foreground"
+                )}
+              >
                 {formatCurrency(Math.abs(diff))}
               </p>
             </div>
@@ -226,20 +277,31 @@ const SpendingForecast = () => {
 
         <div className="space-y-4 pt-2">
           <div className="flex items-center justify-between px-1">
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none">Category Analysis</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none">
+              Category Analysis
+            </p>
             <div className="h-px flex-1 bg-border/40 mx-3" />
           </div>
-          
+
           <div className="grid grid-cols-1 gap-1">
             {predictions.map((p) => {
               const isOverBudget = p.budgetLimit && p.predicted > p.budgetLimit;
-              
+
               return (
-                <div key={p.category} className="group p-4 rounded-2xl hover:bg-muted/40 transition-all duration-300 border border-transparent hover:border-border/60">
+                <div
+                  key={p.category}
+                  className="group p-4 rounded-2xl hover:bg-muted/40 transition-all duration-300 border border-transparent hover:border-border/60"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-lg shadow-sm group-hover:scale-110 transition-transform">
-                        {p.category === "food" ? "🍔" : p.category === "groceries" ? "🛒" : p.category === "transportation" ? "🚗" : "📦"}
+                        {p.category === "food"
+                          ? "🍔"
+                          : p.category === "groceries"
+                          ? "🛒"
+                          : p.category === "transportation"
+                          ? "🚗"
+                          : "📦"}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-bold capitalize leading-none mb-1">
@@ -269,17 +331,22 @@ const SpendingForecast = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="relative h-1.5 bg-muted/60 rounded-full overflow-hidden mb-3">
                     <div
-                      className={cn("absolute left-0 top-0 h-full rounded-full transition-all duration-1000", 
-                        isOverBudget ? "bg-red-500" : "bg-primary")}
+                      className={cn(
+                        "absolute left-0 top-0 h-full rounded-full transition-all duration-1000",
+                        isOverBudget ? "bg-red-500" : "bg-primary"
+                      )}
                       style={{
-                        width: `${Math.min(100, (p.predicted / forecastData.totalPredicted) * 100)}%`
+                        width: `${Math.min(
+                          100,
+                          (p.predicted / forecastData.totalPredicted) * 100
+                        )}%`,
                       }}
                     />
                   </div>
-                  
+
                   <p className="text-[11px] text-muted-foreground/80 leading-relaxed font-medium group-hover:text-foreground/90 transition-colors">
                     {p.reasoning}
                   </p>
@@ -290,10 +357,11 @@ const SpendingForecast = () => {
         </div>
 
         <div className="p-4 bg-muted/20 rounded-2xl border border-border/40">
-            <p className="text-[10px] text-center text-muted-foreground font-medium leading-relaxed italic">
-              "This AI forecast predicts your spending based on 6 months of historical behavior. 
-              The purple bar represents the upcoming month's projection."
-            </p>
+          <p className="text-[10px] text-center text-muted-foreground font-medium leading-relaxed italic">
+            "This AI forecast predicts your spending based on 6 months of
+            historical behavior. The purple bar represents the upcoming month's
+            projection."
+          </p>
         </div>
       </CardContent>
     </Card>

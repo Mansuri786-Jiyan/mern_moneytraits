@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { MoreHorizontal, Pencil, Trash2, Loader } from "lucide-react";
 import { formatCurrency } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const BudgetCard = ({ budget, onEdit, onDelete, isDeleting }) => {
-  const { category, limitAmount, spent, remaining, percentage, isOverBudget } = budget;
+  const { category, limitAmount, spent, remaining, percentage, isOverBudget } =
+    budget;
 
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -76,7 +76,10 @@ const BudgetCard = ({ budget, onEdit, onDelete, isDeleting }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Progress value={percentage} className={cn("h-2", getProgressColor(percentage))} />
+          <Progress
+            value={percentage}
+            className={cn("h-2", getProgressColor(percentage))}
+          />
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
               Spent: {formatCurrency(spent)}
@@ -96,7 +99,9 @@ const BudgetCard = ({ budget, onEdit, onDelete, isDeleting }) => {
               </p>
             )}
           </div>
-          <p className={cn("text-sm font-bold", getPercentageColor(percentage))}>
+          <p
+            className={cn("text-sm font-bold", getPercentageColor(percentage))}
+          >
             {percentage}%
           </p>
         </div>

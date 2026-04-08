@@ -1,7 +1,13 @@
-import { jsx as _jsx } from "react/jsx-runtime";
+import React from "react";
 import AppRoutes from "./routes/index.jsx";
 import { ThemeProvider } from "./context/theme-provider.jsx";
+
 function App() {
-    return (_jsx(ThemeProvider, { defaultTheme: "light", storageKey: "vite-ui-theme", children: _jsx(AppRoutes, {}) }));
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <AppRoutes />
+    </ThemeProvider>
+  );
 }
+
 export default App;

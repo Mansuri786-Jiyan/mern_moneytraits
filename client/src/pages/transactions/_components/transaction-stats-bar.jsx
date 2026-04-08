@@ -26,7 +26,9 @@ const TransactionStatsBar = () => {
           <Receipt className="h-5 w-5 text-white/70" />
         </div>
         <div>
-          <p className="text-[13px] text-gray-300 font-medium mb-1">Transactions</p>
+          <p className="text-[13px] text-gray-300 font-medium mb-1">
+            Transactions
+          </p>
           <p className="text-3xl font-bold text-white leading-none">
             {totalCount.toLocaleString()}
           </p>

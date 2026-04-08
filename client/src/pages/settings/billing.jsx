@@ -1,6 +1,73 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React from "react";
 import { Separator } from "@/components/ui/separator";
+
 const Billing = () => {
-    return (_jsxs("div", { className: "space-y-6", children: [_jsxs("div", { children: [_jsx("h3", { className: "text-lg font-medium", children: "Billing" }), _jsx("p", { className: "text-sm text-muted-foreground", children: "Manage your subscription and billing information" })] }), _jsx(Separator, {}), _jsx("div", { className: "w-full", children: _jsxs("div", { className: "mt-0", children: [_jsx("h1", { className: "text-lg font-medium mb-2", children: "Support Us" }), _jsxs("p", { className: "text-base mb-2", children: ["The Billing feature is part of the ", _jsx("strong", { children: "extended version" }), " ", "of this project. It took ", _jsx("strong", { children: "weeks and months" }), " to design, build, and refine."] }), _jsx("p", { className: "text-base mb-2", children: "By supporting us, you\u2019ll unlock premium billing features including:" }), _jsxs("ul", { className: "list-disc pl-5 text-base mb-2", children: [_jsx("li", { children: _jsx("strong", { children: "Free Trial + Stripe Subscriptions" }) }), _jsxs("li", { children: [_jsx("strong", { children: "Monthly & Yearly Plans" }), " built-in"] }), _jsxs("li", { children: [_jsx("strong", { children: "Switch between plans" }), " (monthly \u2194 yearly)"] }), _jsxs("li", { children: [_jsx("strong", { children: "Manage & Cancel Subscriptions" }), " anytime"] }), _jsx("li", { children: _jsx("strong", { children: "Step-by-step Setup Video" }) }), _jsx("li", { children: _jsx("strong", { children: "Full Source Code" }) }), _jsx("li", { children: _jsx("strong", { children: "Production-Ready Deployment" }) })] }), _jsx("p", { className: "text-base mb-2", children: "Your support helps us keep building free, high-quality projects for the community." }), _jsxs("p", { className: "text-base font-medium", children: ["\uD83D\uDD13 ", _jsx("span", { className: "text-green-600", children: "Get it here:" }), _jsx("a", { className: "text-blue-500 underline ml-1", href: "https://tinyurl.com/extended-stripe-integration", target: "_blank", rel: "noopener noreferrer", children: "Click Here" })] }), _jsx("br", {}), _jsx("br", {})] }) })] }));
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Billing</h3>
+        <p className="text-sm text-muted-foreground">
+          Manage your subscription and billing information
+        </p>
+      </div>
+
+      <Separator />
+
+      <div className="w-full">
+        <div className="mt-0">
+          <h1 className="text-lg font-medium mb-2">Support Us</h1>
+          <p className="text-base mb-2">
+            The Billing feature is part of the <strong>extended version</strong>{" "}
+            of this project. It took <strong>weeks and months</strong> to
+            design, build, and refine.
+          </p>
+          <p className="text-base mb-2">
+            By supporting us, you’ll unlock premium billing features including:
+          </p>
+          <ul className="list-disc pl-5 text-base mb-2">
+            <li>
+              <strong>Free Trial + Stripe Subscriptions</strong>
+            </li>
+            <li>
+              <strong>Monthly & Yearly Plans</strong> built-in
+            </li>
+            <li>
+              <strong>Switch between plans</strong> (monthly ↔ yearly)
+            </li>
+            <li>
+              <strong>Manage & Cancel Subscriptions</strong> anytime
+            </li>
+            <li>
+              <strong>Step-by-step Setup Video</strong>
+            </li>
+            <li>
+              <strong>Full Source Code</strong>
+            </li>
+            <li>
+              <strong>Production-Ready Deployment</strong>
+            </li>
+          </ul>
+          <p className="text-base mb-2">
+            Your support helps us keep building free, high-quality projects for
+            the community.
+          </p>
+          <p className="text-base font-medium">
+            🔓 <span className="text-green-600">Get it here:</span>
+            <a
+              className="text-blue-500 underline ml-1"
+              href="https://tinyurl.com/extended-stripe-integration"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Click Here
+            </a>
+          </p>
+          <br />
+          <br />
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export default Billing;

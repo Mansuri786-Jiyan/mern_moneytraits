@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { NuqsAdapter } from "nuqs/adapters/react";
@@ -6,7 +5,24 @@ import "./index.css";
 import App from "./App.jsx";
 import { Toaster } from "sonner";
 import { Provider } from "react-redux";
-import { store } from "./app/store.js";
-import { persistor } from "./app/store.js";
+import { store, persistor } from "./app/store.js";
 import { PersistGate } from "redux-persist/integration/react";
-createRoot(document.getElementById("root")).render(_jsx(StrictMode, { children: _jsx(Provider, { store: store, children: _jsxs(PersistGate, { loading: null, persistor: persistor, children: [_jsx(NuqsAdapter, { children: _jsx(App, {}) }), _jsx(Toaster, { position: "top-center", expand: true, duration: 5000, richColors: true, closeButton: true })] }) }) }));
+
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <NuqsAdapter>
+          <App />
+        </NuqsAdapter>
+        <Toaster
+          position="top-center"
+          expand
+          duration={5000}
+          richColors
+          closeButton
+        />
+      </PersistGate>
+    </Provider>
+  </StrictMode>
+);

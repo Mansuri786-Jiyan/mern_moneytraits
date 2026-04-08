@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { PlusIcon, PiggyBank, Target } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
 import PageLayout from "@/components/page-layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/empty-state";
-
-import { useGetAllBudgetsQuery, useDeleteBudgetMutation } from "@/features/budget/budgetAPI";
+import {
+  useGetAllBudgetsQuery,
+  useDeleteBudgetMutation,
+} from "@/features/budget/budgetAPI";
 import { useGetAllGoalsQuery, useDeleteGoalMutation } from "@/features/goal/goalAPI";
-
 import BudgetCard from "./_component/budget-card";
 import BudgetSummaryBar from "./_component/budget-summary-bar";
 import BudgetMonthSelector from "./_component/budget-month-selector";
@@ -38,8 +38,10 @@ const Budget = () => {
   const [goalEditData, setGoalEditData] = useState(null);
 
   // API
-  const { data: budgetData, isFetching: isBudgetFetching } = useGetAllBudgetsQuery({ month, year });
-  const [deleteBudget, { isLoading: isDeletingBudget }] = useDeleteBudgetMutation();
+  const { data: budgetData, isFetching: isBudgetFetching } =
+    useGetAllBudgetsQuery({ month, year });
+  const [deleteBudget, { isLoading: isDeletingBudget }] =
+    useDeleteBudgetMutation();
   const { data: goalData, isFetching: isGoalFetching } = useGetAllGoalsQuery();
   const [deleteGoal, { isLoading: isDeletingGoal }] = useDeleteGoalMutation();
 
@@ -55,17 +57,31 @@ const Budget = () => {
   const completedGoals = goals.filter((g) => g.status === "COMPLETED");
 
   // Budget handlers
-  const handleBudgetEdit = (budget) => { setBudgetEditData(budget); setBudgetDialogOpen(true); };
+  const handleBudgetEdit = (budget) => {
+    setBudgetEditData(budget);
+    setBudgetDialogOpen(true);
+  };
   const handleBudgetDelete = async (id) => {
-    try { await deleteBudget(id).unwrap(); toast.success("Budget deleted"); }
-    catch (e) { toast.error(e.data?.message || "Failed to delete budget"); }
+    try {
+      await deleteBudget(id).unwrap();
+      toast.success("Budget deleted");
+    } catch (e) {
+      toast.error(e.data?.message || "Failed to delete budget");
+    }
   };
 
   // Goal handlers
-  const handleGoalEdit = (goal) => { setGoalEditData(goal); setGoalDialogOpen(true); };
+  const handleGoalEdit = (goal) => {
+    setGoalEditData(goal);
+    setGoalDialogOpen(true);
+  };
   const handleGoalDelete = async (id) => {
-    try { await deleteGoal(id).unwrap(); toast.success("Goal deleted"); }
-    catch (e) { toast.error(e.data?.message || "Failed to delete goal"); }
+    try {
+      await deleteGoal(id).unwrap();
+      toast.success("Goal deleted");
+    } catch (e) {
+      toast.error(e.data?.message || "Failed to delete goal");
+    }
   };
 
   // Goal summary stats
@@ -109,7 +125,10 @@ const Budget = () => {
           {/* Summary bar / goal stats */}
           <div className="mt-6">
             {activeTab === "budget" ? (
-              <BudgetSummaryBar summary={summary} isLoading={isBudgetFetching} />
+              <BudgetSummaryBar
+                summary={summary}
+                isLoading={isBudgetFetching}
+              />
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
@@ -118,17 +137,22 @@ const Budget = () => {
                   { label: "Achieved", value: completedGoals.length },
                   {
                     label: "Progress",
-                    value: totalTarget > 0
-                      ? `${Math.round((totalSaved / totalTarget) * 100)}%`
-                      : "—",
+                    value:
+                      totalTarget > 0
+                        ? `${Math.round((totalSaved / totalTarget) * 100)}%`
+                        : "—",
                   },
                 ].map((stat) => (
                   <div
                     key={stat.label}
                     className="bg-white/5 rounded-xl p-3 hover:bg-white/10 transition-all"
                   >
-                    <p className="text-xs text-white/60 font-medium mb-1">{stat.label}</p>
-                    <p className="text-xl font-bold text-white">{isGoalFetching ? "..." : stat.value}</p>
+                    <p className="text-xs text-white/60 font-medium mb-1">
+                      {stat.label}
+                    </p>
+                    <p className="text-xl font-bold text-white">
+                      {isGoalFetching ? "..." : stat.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -160,7 +184,10 @@ const Budget = () => {
               <BudgetMonthSelector
                 month={month}
                 year={year}
-                onChange={({ month: m, year: y }) => { setMonth(m); setYear(y); }}
+                onChange={({ month: m, year: y }) => {
+                  setMonth(m);
+                  setYear(y);
+                }}
               />
             </div>
           )}
@@ -173,7 +200,9 @@ const Budget = () => {
           <>
             {isBudgetFetching ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48" />)}
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-48" />
+                ))}
               </div>
             ) : budgets.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
@@ -182,7 +211,10 @@ const Budget = () => {
                   description="Set spending limits for your expense categories to track where your money goes each month."
                   icon={PiggyBank}
                 />
-                <Button className="mt-6" onClick={() => setBudgetDialogOpen(true)}>
+                <Button
+                  className="mt-6"
+                  onClick={() => setBudgetDialogOpen(true)}
+                >
                   Set your first budget
                 </Button>
               </div>
@@ -207,7 +239,9 @@ const Budget = () => {
           <>
             {isGoalFetching ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-48" />)}
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-48" />
+                ))}
               </div>
             ) : goals.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12">
@@ -216,7 +250,10 @@ const Budget = () => {
                   description="Create a savings goal to track your progress toward something meaningful."
                   icon={Target}
                 />
-                <Button className="mt-6" onClick={() => setGoalDialogOpen(true)}>
+                <Button
+                  className="mt-6"
+                  onClick={() => setGoalDialogOpen(true)}
+                >
                   Create your first goal
                 </Button>
               </div>
@@ -267,12 +304,18 @@ const Budget = () => {
       {/* Dialogs */}
       <SetBudgetDialog
         open={budgetDialogOpen}
-        onClose={() => { setBudgetDialogOpen(false); setBudgetEditData(null); }}
+        onClose={() => {
+          setBudgetDialogOpen(false);
+          setBudgetEditData(null);
+        }}
         editData={budgetEditData}
       />
       <GoalDialog
         open={goalDialogOpen}
-        onClose={() => { setGoalDialogOpen(false); setGoalEditData(null); }}
+        onClose={() => {
+          setGoalDialogOpen(false);
+          setGoalEditData(null);
+        }}
         editData={goalEditData}
       />
     </PageLayout>

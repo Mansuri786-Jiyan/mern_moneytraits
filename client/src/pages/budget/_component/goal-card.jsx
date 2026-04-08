@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2, Loader, Target, CheckCircle2 } from "lucide-react";
+import React from "react";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Loader,
+  Target,
+  CheckCircle2,
+} from "lucide-react";
 import { formatCurrency } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -21,7 +28,10 @@ import {
 
 const GoalCard = ({ goal, onEdit, onDelete, isDeleting }) => {
   const { name, targetAmount, currentAmount, deadline, status } = goal;
-  const percentage = Math.min(Math.round((currentAmount / targetAmount) * 100), 100);
+  const percentage = Math.min(
+    Math.round((currentAmount / targetAmount) * 100),
+    100
+  );
   const isCompleted = status === "COMPLETED";
   const remaining = Math.max(targetAmount - currentAmount, 0);
 
@@ -40,11 +50,19 @@ const GoalCard = ({ goal, onEdit, onDelete, isDeleting }) => {
       )}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-2">
-          <div className={cn("p-1.5 rounded-lg", isCompleted ? "bg-green-100 dark:bg-green-900/30" : "bg-primary/10")}>
-            {isCompleted
-              ? <CheckCircle2 className="h-4 w-4 text-green-500" />
-              : <Target className="h-4 w-4 text-primary" />
-            }
+          <div
+            className={cn(
+              "p-1.5 rounded-lg",
+              isCompleted
+                ? "bg-green-100 dark:bg-green-900/30"
+                : "bg-primary/10"
+            )}
+          >
+            {isCompleted ? (
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+            ) : (
+              <Target className="h-4 w-4 text-primary" />
+            )}
           </div>
           <CardTitle className="text-sm font-medium">{name}</CardTitle>
           {isCompleted && (
@@ -90,7 +108,9 @@ const GoalCard = ({ goal, onEdit, onDelete, isDeleting }) => {
         <div className="flex items-center justify-between">
           <div>
             {isCompleted ? (
-              <p className="text-sm font-medium text-green-500">Goal achieved! 🎉</p>
+              <p className="text-sm font-medium text-green-500">
+                Goal achieved! 🎉
+              </p>
             ) : (
               <p className="text-sm text-muted-foreground">
                 {formatCurrency(remaining)} to go
@@ -102,10 +122,16 @@ const GoalCard = ({ goal, onEdit, onDelete, isDeleting }) => {
               </p>
             )}
           </div>
-          <p className={cn(
-            "text-sm font-bold",
-            isCompleted ? "text-green-500" : percentage >= 80 ? "text-amber-500" : "text-primary"
-          )}>
+          <p
+            className={cn(
+              "text-sm font-bold",
+              isCompleted
+                ? "text-green-500"
+                : percentage >= 80
+                ? "text-amber-500"
+                : "text-primary"
+            )}
+          >
             {percentage}%
           </p>
         </div>

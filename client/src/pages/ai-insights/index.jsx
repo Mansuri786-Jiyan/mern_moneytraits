@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/format-currency";
-import { useSummaryAnalyticsQuery, useGetForecastQuery } from "@/features/analytics/analyticsAPI";
+import {
+  useSummaryAnalyticsQuery,
+  useGetForecastQuery,
+} from "@/features/analytics/analyticsAPI";
 import { useGetBudgetSummaryQuery } from "@/features/budget/budgetAPI";
 import { useSendChatMessageMutation } from "@/features/chatbot/chatbotAPI";
 import { useTypedSelector } from "@/app/hook";
@@ -32,7 +35,11 @@ import {
 } from "@/components/ui/card";
 
 const SECTIONS = ["overview", "forecast", "chat"];
-const SECTION_LABELS = { overview: "Overview", forecast: "Forecast", chat: "Chat with AI" };
+const SECTION_LABELS = {
+  overview: "Overview",
+  forecast: "Forecast",
+  chat: "Chat with AI",
+};
 
 const SUGGESTED_QUESTIONS = [
   "How much did I spend this month?",
@@ -64,9 +71,10 @@ export default function AIInsights() {
 
   const { user } = useTypedSelector((state) => state.auth);
 
-  const { data: summaryResponse, isFetching: isSummaryLoading } = useSummaryAnalyticsQuery({
-    preset: "30days",
-  });
+  const { data: summaryResponse, isFetching: isSummaryLoading } =
+    useSummaryAnalyticsQuery({
+      preset: "30days",
+    });
   const { data: forecastResponse } = useGetForecastQuery();
   const { data: budgetResponse } = useGetBudgetSummaryQuery();
   const [sendChatMessage] = useSendChatMessageMutation();
@@ -98,7 +106,9 @@ export default function AIInsights() {
       }
     };
     generateSummary();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [summaryData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Chat handlers ──────────────────────────────────────────────
@@ -161,11 +171,15 @@ export default function AIInsights() {
   const quickStats = [
     {
       label: "Monthly income",
-      value: isSummaryLoading ? "..." : formatCurrency(summaryData?.totalIncome || 0),
+      value: isSummaryLoading
+        ? "..."
+        : formatCurrency(summaryData?.totalIncome || 0),
     },
     {
       label: "Monthly expenses",
-      value: isSummaryLoading ? "..." : formatCurrency(summaryData?.totalExpenses || 0),
+      value: isSummaryLoading
+        ? "..."
+        : formatCurrency(summaryData?.totalExpenses || 0),
     },
     {
       label: "Savings rate",
@@ -196,7 +210,9 @@ export default function AIInsights() {
           ? "All budgets on track this month — excellent discipline!"
           : budgetsOverLimit === null
           ? "Set budgets to track your spending limits."
-          : `${budgetsOverLimit} budget${budgetsOverLimit > 1 ? "s" : ""} exceeded — review your spending.`,
+          : `${budgetsOverLimit} budget${
+              budgetsOverLimit > 1 ? "s" : ""
+            } exceeded — review your spending.`,
     },
     {
       icon: PiggyBank,
@@ -212,12 +228,18 @@ export default function AIInsights() {
       {/* Top row */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
         <div>
-          <h2 className="text-2xl lg:text-4xl font-medium text-white">AI Insights</h2>
-          <p className="text-white/60 text-sm mt-1">Powered by Google Gemini AI</p>
+          <h2 className="text-2xl lg:text-4xl font-medium text-white">
+            AI Insights
+          </h2>
+          <p className="text-white/60 text-sm mt-1">
+            Powered by Google Gemini AI
+          </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/30">
           <Brain className="h-4 w-4 text-purple-300" />
-          <span className="text-sm text-purple-200 font-medium">Gemini 2.5 Flash</span>
+          <span className="text-sm text-purple-200 font-medium">
+            Gemini 2.5 Flash
+          </span>
         </div>
       </div>
 
@@ -228,7 +250,9 @@ export default function AIInsights() {
             key={stat.label}
             className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-all"
           >
-            <p className="text-[13px] text-gray-300 font-medium mb-2">{stat.label}</p>
+            <p className="text-[13px] text-gray-300 font-medium mb-2">
+              {stat.label}
+            </p>
             <p className="text-2xl font-bold text-white">{stat.value}</p>
           </div>
         ))}
@@ -258,7 +282,9 @@ export default function AIInsights() {
   const overviewSection = (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left: Financial Health Score */}
-      <FinancialHealthScore dateRange={{ value: "30days", label: "Last 30 Days" }} />
+      <FinancialHealthScore
+        dateRange={{ value: "30days", label: "Last 30 Days" }}
+      />
 
       {/* Right: AI Summary Card */}
       <Card className="!shadow-none border border-gray-100 dark:border-border h-full">
@@ -267,7 +293,9 @@ export default function AIInsights() {
             <Sparkles className="h-5 w-5 text-purple-500" />
             AI financial summary
           </CardTitle>
-          <CardDescription>Personalized analysis of your last 30 days</CardDescription>
+          <CardDescription>
+            Personalized analysis of your last 30 days
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingSummary ? (
@@ -277,7 +305,9 @@ export default function AIInsights() {
               <Skeleton className="h-4 w-3/5" />
             </div>
           ) : aiSummary ? (
-            <p className="text-sm text-muted-foreground leading-relaxed">{aiSummary}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {aiSummary}
+            </p>
           ) : (
             <p className="text-sm text-muted-foreground italic">
               Add more transactions to get your AI summary.
@@ -289,8 +319,13 @@ export default function AIInsights() {
             <p className="text-sm font-medium mb-3">Quick financial tips</p>
             <div className="space-y-2.5">
               {tips.map((item, i) => (
-                <div key={i} className={cn("flex gap-3 p-3 rounded-lg", item.bg)}>
-                  <item.icon className={cn("h-4 w-4 shrink-0 mt-0.5", item.color)} />
+                <div
+                  key={i}
+                  className={cn("flex gap-3 p-3 rounded-lg", item.bg)}
+                >
+                  <item.icon
+                    className={cn("h-4 w-4 shrink-0 mt-0.5", item.color)}
+                  />
                   <p className="text-xs text-muted-foreground">{item.tip}</p>
                 </div>
               ))}
@@ -318,7 +353,9 @@ export default function AIInsights() {
       <Card className="!shadow-none border border-gray-100 dark:border-border">
         <CardHeader>
           <CardTitle className="text-lg">Month over month trend</CardTitle>
-          <CardDescription>How your spending has changed over time</CardDescription>
+          <CardDescription>
+            How your spending has changed over time
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {isSummaryLoading ? (
@@ -393,7 +430,9 @@ export default function AIInsights() {
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/30 shrink-0">
               <Brain className="h-4 w-4 text-purple-500" />
-              <span className="text-xs text-purple-600 font-semibold">Gemini AI</span>
+              <span className="text-xs text-purple-600 font-semibold">
+                Gemini AI
+              </span>
             </div>
           </CardHeader>
 
@@ -519,7 +558,8 @@ export default function AIInsights() {
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground mb-3">
-              {messages.length - 1} message{messages.length - 1 !== 1 ? "s" : ""} in this session
+              {messages.length - 1} message
+              {messages.length - 1 !== 1 ? "s" : ""} in this session
             </p>
             <Button
               variant="outline"

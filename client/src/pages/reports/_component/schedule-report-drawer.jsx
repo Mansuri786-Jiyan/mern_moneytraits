@@ -1,40 +1,38 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Button } from "@/components/ui/button";
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, } from "@/components/ui/drawer";
-import { CalendarIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+import React from "react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { XIcon } from "lucide-react";
 import ScheduleReportForm from "./schedule-report-form.jsx";
+
 const ScheduleReportDrawer = ({ open, onOpenChange, trigger }) => {
   return (
-    _jsxs(Drawer, {
-      direction: "right",
-      open: open,
-      onOpenChange: onOpenChange,
-      children: [
-        trigger && _jsx(DrawerTrigger, { asChild: true, children: trigger }),
-        _jsxs(DrawerContent, {
-          className: "max-w-md overflow-hidden overflow-y-auto",
-          children: [
-            _jsxs(DrawerHeader, {
-              className: "relative",
-              children: [
-                _jsxs("div", {
-                  children: [
-                    _jsx(DrawerTitle, { className: "text-xl font-semibold", children: "Report Settings" }),
-                    _jsx(DrawerDescription, { className: "-mt-1", children: "Enable or disable monthly financial report emails" })
-                  ]
-                }),
-                _jsx(DrawerClose, {
-                  className: "absolute top-4 right-4",
-                  children: _jsx(XIcon, { className: "h-5 w-5 !cursor-pointer" })
-                })
-              ]
-            }),
-            _jsx(ScheduleReportForm, { onCloseDrawer: () => onOpenChange(false) })
-          ]
-        })
-      ]
-    })
+    <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+      {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
+      <DrawerContent className="max-w-md overflow-hidden overflow-y-auto">
+        <DrawerHeader className="relative">
+          <div>
+            <DrawerTitle className="text-xl font-semibold">
+              Report Settings
+            </DrawerTitle>
+            <DrawerDescription className="-mt-1">
+              Enable or disable monthly financial report emails
+            </DrawerDescription>
+          </div>
+          <DrawerClose className="absolute top-4 right-4">
+            <XIcon className="h-5 w-5 !cursor-pointer" />
+          </DrawerClose>
+        </DrawerHeader>
+        <ScheduleReportForm onCloseDrawer={() => onOpenChange(false)} />
+      </DrawerContent>
+    </Drawer>
   );
 };
+
 export default ScheduleReportDrawer;

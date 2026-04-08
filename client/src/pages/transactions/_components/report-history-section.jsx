@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FileText, Loader } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useGetAllReportsQuery } from "@/features/report/reportAPI";
 import EmptyState from "@/components/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,9 +9,9 @@ import { DataTable } from "@/components/data-table";
 import { reportColumns } from "./reports/column";
 
 const ReportHistorySection = () => {
-  const [filter, setFilter] = useState({ 
-    pageNumber: 1, 
-    pageSize: 5 
+  const [filter, setFilter] = useState({
+    pageNumber: 1,
+    pageSize: 5,
   });
   const [scheduleOpen, setScheduleOpen] = useState(false);
 
@@ -39,7 +39,9 @@ const ReportHistorySection = () => {
     <div className="mt-4">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Report history</h3>
+          <h3 className="text-lg font-semibold text-foreground">
+            Report history
+          </h3>
           <p className="text-sm text-muted-foreground">
             Your monthly auto-generated reports and custom exports
           </p>
@@ -48,7 +50,11 @@ const ReportHistorySection = () => {
           open={scheduleOpen}
           onOpenChange={setScheduleOpen}
           trigger={
-            <Button variant="outline" size="sm" onClick={() => setScheduleOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setScheduleOpen(true)}
+            >
               Schedule reports
             </Button>
           }
@@ -67,9 +73,9 @@ const ReportHistorySection = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          <DataTable 
-            data={reports} 
-            columns={reportColumns} 
+          <DataTable
+            data={reports}
+            columns={reportColumns}
             showSearch={false}
             isLoading={isFetching}
             pagination={{

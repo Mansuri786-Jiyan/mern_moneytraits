@@ -3,18 +3,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Loader } from "lucide-react";
-
-import { CATEGORIES } from "@/constant";
-import { useSetBudgetMutation } from "@/features/budget/budgetAPI";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -24,6 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -31,21 +27,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import CurrencyInputField from "@/components/ui/currency-input";
+import { 
+  useSetBudgetMutation, 
+} from "@/features/budget/budgetAPI";
+import { useGetCategoriesQuery } from "@/features/category/categoryAPI";
 
-const budgetSchema = z.object({
-  category: z.string().min(1, "Select a category"),
-  limitAmount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "Enter a valid amount",
-  }),
+const formSchema = z.object({
+  category: z.string().min(1, "Category is required"),
+  limitAmount: z.string().min(1, "Limit is required"),
 });
 
 const SetBudgetDialog = ({ open, onClose, editData }) => {
   const [setBudget, { isLoading }] = useSetBudgetMutation();
+  const { data: categoriesData } = useGetCategoriesQuery();
+  const categories = categoriesData?.data || [];
 
   const form = useForm({
-    resolver: zodResolver(budgetSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       category: "",
       limitAmount: "",
@@ -59,35 +57,37 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
         limitAmount: editData.limitAmount.toString(),
       });
     } else {
-      form.reset({
-        category: "",
-        limitAmount: "",
-      });
+      form.reset({ category: "", limitAmount: "" });
     }
-  }, [editData, form, open]);
+  }, [editData, open, form]);
 
   const onSubmit = async (values) => {
     try {
-      await setBudget({
-        category: values.category,
-        limitAmount: Number(values.limitAmount),
-      }).unwrap();
-      toast.success("Budget saved");
+      const payload = {
+        ...values,
+        limitAmount: parseFloat(values.limitAmount),
+        // Use current month/year if not provided? 
+        // The backend should handle current month if omitted, 
+        // but we can pass it if we want.
+      };
+
+      await setBudget(payload).unwrap();
+      toast.success(editData ? "Budget updated" : "Budget created");
       onClose();
-    } catch (error) {
-      toast.error(error.data?.message || "Failed to save budget");
+    } catch (e) {
+      toast.error(e.data?.message || "Something went wrong");
     }
   };
 
-  const expenseCategories = CATEGORIES.filter((cat) => cat.value !== "income");
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Budget" : "Set Budget Limit"}</DialogTitle>
+          <DialogTitle>{editData ? "Edit Budget" : "Set New Budget"}</DialogTitle>
           <DialogDescription>
-            Set a monthly spending limit for this category
+            {editData
+              ? "Change your spending limit for this category"
+              : "Set a monthly spending limit for a specific category"}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -101,18 +101,17 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    value={field.value}
                     disabled={!!editData}
                   >
                     <FormControl>
-                      <SelectTrigger onPointerDown={(e) => e.preventDefault()}>
-                        <SelectValue placeholder="Select a category" />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {expenseCategories.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
+                      {categories.map((cat) => (
+                        <SelectItem key={cat._id} value={cat.name}>
+                          {cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -126,25 +125,22 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
               name="limitAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Limit Amount</FormLabel>
+                  <FormLabel>Limit Amount (₹)</FormLabel>
                   <FormControl>
-                    <CurrencyInputField
-                      prefix="₹"
-                      placeholder="5000"
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value || "")}
-                    />
+                    <Input type="number" placeholder="5000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DialogFooter className="pt-4">
-              <Button type="submit" disabled={isLoading} className="w-full">
-                {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-                {editData ? "Update Budget" : "Set Budget"}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button type="button" variant="ghost" onClick={onClose}>
+                Cancel
               </Button>
-            </DialogFooter>
+              <Button type="submit" disabled={isLoading}>
+                {editData ? "Update" : "Create"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

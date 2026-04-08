@@ -1,8 +1,20 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React from "react";
 import { PROTECTED_ROUTES } from "@/routes/common/routePath";
 import { GalleryVerticalEnd } from "lucide-react";
 import { Link } from "react-router-dom";
+
 const Logo = (props) => {
-    return (_jsxs(Link, { to: props.url || PROTECTED_ROUTES.OVERVIEW, className: "flex items-center gap-2", children: [_jsx("div", { className: "bg-green-500 text-white h-6.5 w-6.5 rounded flex items-center justify-center", children: _jsx(GalleryVerticalEnd, { className: "size-4" }) }), _jsx("span", { className: "font-semibold text-lg", children: "Moneytraits" })] }));
+  return (
+    <Link
+      to={props.url || PROTECTED_ROUTES.OVERVIEW}
+      className="flex items-center gap-2"
+    >
+      <div className="bg-green-500 text-white h-6.5 w-6.5 rounded flex items-center justify-center">
+        <GalleryVerticalEnd className="size-4" />
+      </div>
+      <span className="font-semibold text-lg">Moneytraits</span>
+    </Link>
+  );
 };
+
 export default Logo;

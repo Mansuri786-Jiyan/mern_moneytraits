@@ -4,7 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
-import { useCreateGoalMutation, useUpdateGoalMutation } from "@/features/goal/goalAPI";
+import {
+  useCreateGoalMutation,
+  useUpdateGoalMutation,
+} from "@/features/goal/goalAPI";
 import {
   Dialog,
   DialogContent,
@@ -27,12 +30,16 @@ import CurrencyInputField from "@/components/ui/currency-input";
 
 const goalSchema = z.object({
   name: z.string().min(1, "Goal name is required").max(100),
-  targetAmount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "Enter a valid target amount",
-  }),
-  currentAmount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "Enter a valid amount",
-  }),
+  targetAmount: z
+    .string()
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Enter a valid target amount",
+    }),
+  currentAmount: z
+    .string()
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: "Enter a valid amount",
+    }),
   deadline: z.string().optional(),
 });
 
@@ -62,7 +69,12 @@ const GoalDialog = ({ open, onClose, editData }) => {
           : "",
       });
     } else {
-      form.reset({ name: "", targetAmount: "", currentAmount: "0", deadline: "" });
+      form.reset({
+        name: "",
+        targetAmount: "",
+        currentAmount: "0",
+        deadline: "",
+      });
     }
   }, [editData, open, form]);
 
@@ -91,9 +103,13 @@ const GoalDialog = ({ open, onClose, editData }) => {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{editData ? "Edit Goal" : "Create Savings Goal"}</DialogTitle>
+          <DialogTitle>
+            {editData ? "Edit Goal" : "Create Savings Goal"}
+          </DialogTitle>
           <DialogDescription>
-            {editData ? "Update your savings goal details." : "Set a target to save towards."}
+            {editData
+              ? "Update your savings goal details."
+              : "Set a target to save towards."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -106,7 +122,10 @@ const GoalDialog = ({ open, onClose, editData }) => {
                 <FormItem>
                   <FormLabel>Goal name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Emergency fund, Vacation..." {...field} />
+                    <Input
+                      placeholder="e.g. Emergency fund, Vacation..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -156,7 +175,12 @@ const GoalDialog = ({ open, onClose, editData }) => {
               name="deadline"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deadline <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                  <FormLabel>
+                    Deadline{" "}
+                    <span className="text-muted-foreground font-normal">
+                      (optional)
+                    </span>
+                  </FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>

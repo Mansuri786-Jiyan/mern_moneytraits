@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
-import { 
-  Calendar as CalendarIcon, 
-  FileText, 
-  Sparkles, 
-  Loader, 
-  Mail, 
+import {
+  Calendar as CalendarIcon,
+  FileText,
+  Sparkles,
+  Loader,
+  Mail,
   Download,
-  X
+  X,
 } from "lucide-react";
 import { useTypedSelector } from "@/app/hook";
 import { useSendReportNowMutation } from "@/features/report/reportAPI";
@@ -53,14 +53,15 @@ const GenerateReportDrawer = () => {
     setReportData(null);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8010/api';
+      const baseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:8010/api";
       const url = `${baseUrl}/report/generate?from=${fromDate.toISOString()}&to=${toDate.toISOString()}`;
-      
+
       const res = await fetch(url, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       const json = await res.json();
@@ -87,7 +88,7 @@ const GenerateReportDrawer = () => {
     try {
       await sendReportNow({
         from: fromDate.toISOString(),
-        to: toDate.toISOString()
+        to: toDate.toISOString(),
       }).unwrap();
       toast.success(`Report sent to ${user?.email}`);
     } catch (error) {
@@ -110,7 +111,9 @@ const GenerateReportDrawer = () => {
         <h1 style="color: #00bc7d; margin: 0; font-size: 32px;">Moneytraits</h1>
         <p style="color: #666; font-size: 14px; margin-top: 5px;">Your personal finance companion</p>
       </div>
-      <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Financial Report — ${reportData.period}</h2>
+      <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Financial Report — ${
+        reportData.period
+      }</h2>
       
       <div style="margin-bottom: 30px;">
         <p><strong>Generated for:</strong> ${user?.name} (${user?.email})</p>
@@ -124,23 +127,33 @@ const GenerateReportDrawer = () => {
         </tr>
         <tr>
           <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Income</strong></td>
-          <td style="border: 1px solid #ddd; padding: 12px; color: #22c55e; font-weight: bold;">${formatCurrency(reportData.summary.income)}</td>
+          <td style="border: 1px solid #ddd; padding: 12px; color: #22c55e; font-weight: bold;">${formatCurrency(
+            reportData.summary.income
+          )}</td>
         </tr>
         <tr>
           <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Expenses</strong></td>
-          <td style="border: 1px solid #ddd; padding: 12px; color: #ef4444; font-weight: bold;">${formatCurrency(reportData.summary.expenses)}</td>
+          <td style="border: 1px solid #ddd; padding: 12px; color: #ef4444; font-weight: bold;">${formatCurrency(
+            reportData.summary.expenses
+          )}</td>
         </tr>
         <tr>
           <td style="border: 1px solid #ddd; padding: 12px;"><strong>Net Balance</strong></td>
-          <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">${formatCurrency(reportData.summary.balance)}</td>
+          <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">${formatCurrency(
+            reportData.summary.balance
+          )}</td>
         </tr>
         <tr>
           <td style="border: 1px solid #ddd; padding: 12px;"><strong>Savings Rate</strong></td>
-          <td style="border: 1px solid #ddd; padding: 12px;">${reportData.summary.savingsRate}%</td>
+          <td style="border: 1px solid #ddd; padding: 12px;">${
+            reportData.summary.savingsRate
+          }%</td>
         </tr>
       </table>
 
-      ${reportData.summary.topCategories.length > 0 ? `
+      ${
+        reportData.summary.topCategories.length > 0
+          ? `
         <h3 style="margin-top: 30px; margin-bottom: 15px;">Top Spending Categories</h3>
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
           <thead>
@@ -151,25 +164,41 @@ const GenerateReportDrawer = () => {
             </tr>
           </thead>
           <tbody>
-            ${reportData.summary.topCategories.map(cat => `
+            ${reportData.summary.topCategories
+              .map(
+                (cat) => `
               <tr>
                 <td style="border: 1px solid #ddd; padding: 12px; text-transform: capitalize;">${cat.name}</td>
                 <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${cat.percent}%</td>
-                <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${formatCurrency(cat.amount)}</td>
+                <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${formatCurrency(
+                  cat.amount
+                )}</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join("")}
           </tbody>
         </table>
-      ` : ''}
+      `
+          : ""
+      }
 
-      ${reportData.insights && reportData.insights.length > 0 ? `
+      ${
+        reportData.insights && reportData.insights.length > 0
+          ? `
         <h3 style="margin-top: 30px; margin-bottom: 15px;">AI Insights</h3>
         <ul style="padding-left: 20px; color: #444;">
-          ${reportData.insights.map(insight => `
+          ${reportData.insights
+            .map(
+              (insight) => `
             <li style="margin-bottom: 8px;">${insight}</li>
-          `).join('')}
+          `
+            )
+            .join("")}
         </ul>
-      ` : ''}
+      `
+          : ""
+      }
 
       <div style="margin-top: 50px; text-align: center; color: #888; font-size: 11px; border-top: 1px solid #eee; padding-top: 20px;">
         <p>© ${new Date().getFullYear()} Moneytraits - Secure Personal Finance Management</p>
@@ -179,16 +208,16 @@ const GenerateReportDrawer = () => {
 
     document.body.appendChild(printArea);
     window.print();
-    
+
     window.onafterprint = () => {
-      document.getElementById('report-print-area')?.remove();
+      document.getElementById("report-print-area")?.remove();
     };
   };
 
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <Button 
+        <Button
           variant="outline"
           className="!shadow-none !cursor-pointer !border-gray-500 !text-white !bg-transparent hover:!bg-white/5"
         >
@@ -202,10 +231,15 @@ const GenerateReportDrawer = () => {
             Generate report
           </DrawerTitle>
           <DrawerDescription>
-            Select a date range to generate, preview, email or download your financial report.
+            Select a date range to generate, preview, email or download your
+            financial report.
           </DrawerDescription>
           <DrawerClose asChild>
-            <Button variant="ghost" size="icon" className="absolute right-4 top-4 rounded-full">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-4 top-4 rounded-full"
+            >
               <X className="h-4 w-4" />
             </Button>
           </DrawerClose>
@@ -216,7 +250,9 @@ const GenerateReportDrawer = () => {
           <div className="space-y-4">
             <div className="flex gap-3">
               <div className="flex-1 space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">From date</Label>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  From date
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -227,7 +263,9 @@ const GenerateReportDrawer = () => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {fromDate ? format(fromDate, "MMM dd, yyyy") : "Pick a date"}
+                      {fromDate
+                        ? format(fromDate, "MMM dd, yyyy")
+                        : "Pick a date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -243,7 +281,9 @@ const GenerateReportDrawer = () => {
               </div>
 
               <div className="flex-1 space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">To date</Label>
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  To date
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -262,7 +302,9 @@ const GenerateReportDrawer = () => {
                       mode="single"
                       selected={toDate}
                       onSelect={setToDate}
-                      disabled={(date) => date > new Date() || (fromDate && date < fromDate)}
+                      disabled={(date) =>
+                        date > new Date() || (fromDate && date < fromDate)
+                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -289,13 +331,17 @@ const GenerateReportDrawer = () => {
             <div className="mt-8 border-t pt-6 animate-in fade-in slide-in-from-top-4 duration-500">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <p className="font-semibold text-foreground tracking-tight">{reportData.period}</p>
-                  <p className="text-xs text-muted-foreground">Report snapshot</p>
+                  <p className="font-semibold text-foreground tracking-tight">
+                    {reportData.period}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Report snapshot
+                  </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="rounded-xl h-9 px-3"
                     onClick={handleSendEmail}
                     disabled={isSending}
@@ -307,8 +353,8 @@ const GenerateReportDrawer = () => {
                     )}
                     {isSending ? "Sending..." : "Send to email"}
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="!text-white rounded-xl h-9 px-3 shadow-sm"
                     onClick={handlePrintPDF}
                   >
@@ -320,25 +366,60 @@ const GenerateReportDrawer = () => {
 
               <div className="grid grid-cols-2 gap-3 mt-3">
                 {[
-                  { label: "Income", value: formatCurrency(reportData.summary.income), color: "text-green-500" },
-                  { label: "Expenses", value: formatCurrency(reportData.summary.expenses), color: "text-red-500" },
-                  { label: "Balance", value: formatCurrency(reportData.summary.balance), color: "text-blue-500" },
-                  { label: "Savings rate", value: `${reportData.summary.savingsRate}%`, color: "text-purple-500" },
+                  {
+                    label: "Income",
+                    value: formatCurrency(reportData.summary.income),
+                    color: "text-green-500",
+                  },
+                  {
+                    label: "Expenses",
+                    value: formatCurrency(reportData.summary.expenses),
+                    color: "text-red-500",
+                  },
+                  {
+                    label: "Balance",
+                    value: formatCurrency(reportData.summary.balance),
+                    color: "text-blue-500",
+                  },
+                  {
+                    label: "Savings rate",
+                    value: `${reportData.summary.savingsRate}%`,
+                    color: "text-purple-500",
+                  },
                 ].map((item, idx) => (
-                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border border-muted/50 group hover:bg-muted/50 transition-all">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">{item.label}</p>
-                    <p className={cn("text-base font-black mt-0.5", item.color)}>{item.value}</p>
+                  <div
+                    key={idx}
+                    className="p-3 rounded-lg bg-muted/30 border border-muted/50 group hover:bg-muted/50 transition-all"
+                  >
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
+                      {item.label}
+                    </p>
+                    <p
+                      className={cn(
+                        "text-base font-black mt-0.5",
+                        item.color
+                      )}
+                    >
+                      {item.value}
+                    </p>
                   </div>
                 ))}
               </div>
 
               {/* Top Categories */}
               <div className="mt-6">
-                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">Top spending categories</p>
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">
+                  Top spending categories
+                </p>
                 <div className="space-y-1">
-                  {reportData.summary.topCategories.map(cat => (
-                    <div key={cat.name} className="flex justify-between items-center py-2.5 px-1 border-b border-muted/50 last:border-0 text-sm group transition-all">
-                      <span className="capitalize font-medium text-foreground/80 group-hover:translate-x-0.5 transition-transform">{cat.name}</span>
+                  {reportData.summary.topCategories.map((cat) => (
+                    <div
+                      key={cat.name}
+                      className="flex justify-between items-center py-2.5 px-1 border-b border-muted/50 last:border-0 text-sm group transition-all"
+                    >
+                      <span className="capitalize font-medium text-foreground/80 group-hover:translate-x-0.5 transition-transform">
+                        {cat.name}
+                      </span>
                       <div className="flex items-center gap-4">
                         <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                           {cat.percent}%
@@ -350,7 +431,9 @@ const GenerateReportDrawer = () => {
                     </div>
                   ))}
                   {reportData.summary.topCategories.length === 0 && (
-                    <p className="text-sm text-muted-foreground py-4 italic text-center">No category data for this period</p>
+                    <p className="text-sm text-muted-foreground py-4 italic text-center">
+                      No category data for this period
+                    </p>
                   )}
                 </div>
               </div>
@@ -359,14 +442,19 @@ const GenerateReportDrawer = () => {
               {reportData.insights && reportData.insights.length > 0 && (
                 <div className="mt-8 space-y-3">
                   <div className="flex items-center gap-2">
-                    <p className="text-xs font-black uppercase tracking-widest text-primary/70">AI Financial Insights</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-primary/70">
+                      AI Financial Insights
+                    </p>
                     <div className="h-px flex-1 bg-primary/20" />
                   </div>
                   <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 relative overflow-hidden group">
                     <div className="absolute -top-4 -right-4 w-12 h-12 bg-primary/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
                     <ul className="space-y-2.5 relative z-10">
                       {reportData.insights.map((insight, i) => (
-                        <li key={i} className="text-[13px] text-foreground/80 flex gap-2.5 leading-relaxed">
+                        <li
+                          key={i}
+                          className="text-[13px] text-foreground/80 flex gap-2.5 leading-relaxed"
+                        >
                           <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
                           <span className="font-medium">{insight}</span>
                         </li>

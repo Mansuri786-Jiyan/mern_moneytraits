@@ -1,4 +1,3 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useGetAllBudgetsQuery } from "@/features/budget/budgetAPI";
 import { AlertTriangle, AlertOctagon, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";

@@ -8,8 +8,18 @@ import {
 } from "@/components/ui/select";
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const BudgetMonthSelector = ({ month, year, onChange }) => {
@@ -24,7 +34,8 @@ const BudgetMonthSelector = ({ month, year, onChange }) => {
     onChange({ month, year: parseInt(val) });
   };
 
-  const selectTriggerClass = "!bg-white/10 border-gray-600 !text-white h-9 min-w-[130px]";
+  const selectTriggerClass =
+    "!bg-white/10 border-gray-600 !text-white h-9 min-w-[130px]";
 
   return (
     <div className="flex items-center gap-2 mt-4">
