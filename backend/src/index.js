@@ -27,25 +27,45 @@ import categoryRoutes from "./routes/category.route.js";
 const app = express();
 const BASE_PATH = Env.BASE_PATH;
 
-// CORS FIX (IMPORTANT)
+// CORS configuration
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://mern-moneytraits-gtwj.vercel.app"
-];
+  "https://mern-moneytraits-gtwj.vercel.app",
+  "https://mern-moneytraits.vercel.app",
+  Env.FRONTEND_ORIGIN,
+].filter(Boolean).map(o => o.trim().replace(/\/$/, ""));
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
+    
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+    const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
+                     normalizedOrigin.endsWith(".vercel.app"); // Optional: Allow all Vercel previews
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    if (isAllowed) {
+      callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin);
-      return callback(new Error("CORS not allowed"));
+      console.log(`CORS Blocked: ${origin}. Allowed:`, allowedOrigins);
+      callback(new Error(`CORS not allowed for origin: ${origin}`));
     }
   },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type", 
+    "Authorization", 
+    "X-Requested-With", 
+    "Accept", 
+    "Origin",
+    "Access-Control-Allow-Origin"
+  ],
   credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
+
+// Express pre-flighting
+app.options("*", cors());
 
 // Body parsers
 app.use(express.json());
