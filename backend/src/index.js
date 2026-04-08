@@ -64,8 +64,8 @@ app.use(cors({
   optionsSuccessStatus: 204
 }));
 
-// Express pre-flighting
-app.options("*", cors());
+// Express pre-flighting with Express 5 support removed because app.use(cors()) is sufficient 
+// and '*' throws a path-to-regexp Missing parameter name error.
 
 // Body parsers
 app.use(express.json());
