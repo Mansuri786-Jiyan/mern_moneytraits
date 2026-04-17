@@ -1,0 +1,159 @@
+# ER Diagram
+
+This diagram is based on the Mongoose models in `backend/src/models`.
+
+```mermaid
+%%{init: {'theme':'base','themeVariables': {
+  'background':'#1f1f1f',
+  'primaryColor':'#ffffff',
+  'primaryTextColor':'#000000',
+  'primaryBorderColor':'#111111',
+  'lineColor':'#111111',
+  'fontFamily':'Times New Roman'
+}}}%%
+flowchart TB
+    classDef entity fill:#ffffff,stroke:#111111,stroke-width:1.5px,color:#000000;
+    classDef rel fill:#ffffff,stroke:#111111,stroke-width:1.5px,color:#000000;
+    classDef attr fill:#ffffff,stroke:#111111,stroke-width:1.3px,color:#000000;
+
+  subgraph TOPROW[ ]
+    direction LR
+
+    subgraph ORGBOX[ ]
+      direction TB
+      O_TOP1([City]):::attr
+      O_TOP2([State]):::attr
+      O_TOP3([Pincode]):::attr
+      O_TOP4([Email]):::attr
+      O_TOP5([UserID]):::attr
+      O_TOP6([Password1]):::attr
+      O_TOP7([Password2]):::attr
+      ORG[OrganizationDetails]:::entity
+      O_BOT1([Address2]):::attr
+      O_BOT2([Address1]):::attr
+      O_BOT3([GSTIN Number]):::attr
+      O_BOT4([PAN Number]):::attr
+      O_BOT5([Company Type]):::attr
+      O_BOT6([Company Name]):::attr
+      O_BOT7([Owner Name]):::attr
+
+      ORG --- O_TOP1
+      ORG --- O_TOP2
+      ORG --- O_TOP3
+      ORG --- O_TOP4
+      ORG --- O_TOP5
+      ORG --- O_TOP6
+      ORG --- O_TOP7
+      ORG --- O_BOT1
+      ORG --- O_BOT2
+      ORG --- O_BOT3
+      ORG --- O_BOT4
+      ORG --- O_BOT5
+      ORG --- O_BOT6
+      ORG --- O_BOT7
+    end
+
+    subgraph PRODBOX[ ]
+      direction TB
+      P_TOP1([Discount]):::attr
+      P_TOP2([CGST]):::attr
+      P_TOP3([Price]):::attr
+      P_TOP4([HSN Code]):::attr
+      P_TOP5([Product Name]):::attr
+      PROD[Product]:::entity
+      P_BOT1([Invoice]):::attr
+      P_BOT2([SGST]):::attr
+      P_BOT3([IGST]):::attr
+      P_BOT4([Total]):::attr
+
+      PROD --- P_TOP1
+      PROD --- P_TOP2
+      PROD --- P_TOP3
+      PROD --- P_TOP4
+      PROD --- P_TOP5
+      PROD --- P_BOT1
+      PROD --- P_BOT2
+      PROD --- P_BOT3
+      PROD --- P_BOT4
+    end
+  end
+
+  subgraph MIDROW[ ]
+    direction LR
+    HAVE{have}:::rel
+    MANAGE{Manage}:::rel
+    FOR{for}:::rel
+    VIEW{view/\nDownload}:::rel
+  end
+
+  subgraph BOTTOMROW[ ]
+    direction LR
+
+    subgraph CUSTBOX[ ]
+      direction TB
+      C_TOP1([Company Name]):::attr
+      C_TOP2([Cus_name]):::attr
+      C_TOP3([Contact Person]):::attr
+      C_TOP4([Contact Number]):::attr
+      C_TOP5([Company Type]):::attr
+      CUST[CustomerDetails]:::entity
+      C_BOT1([Address1]):::attr
+      C_BOT2([Address2]):::attr
+      C_BOT3([Land Mark]):::attr
+      C_BOT4([Country]):::attr
+      C_BOT5([State]):::attr
+      C_BOT6([City]):::attr
+      C_BOT7([Pincode]):::attr
+
+      CUST --- C_TOP1
+      CUST --- C_TOP2
+      CUST --- C_TOP3
+      CUST --- C_TOP4
+      CUST --- C_TOP5
+      CUST --- C_BOT1
+      CUST --- C_BOT2
+      CUST --- C_BOT3
+      CUST --- C_BOT4
+      CUST --- C_BOT5
+      CUST --- C_BOT6
+      CUST --- C_BOT7
+    end
+
+    subgraph INVBOX[ ]
+      direction TB
+      I_TOP1([Document Note]):::attr
+      I_TOP2([T_C]):::attr
+      I_TOP3([Payment_note]):::attr
+      I_TOP4([Payment Type]):::attr
+      I_TOP5([Bank]):::attr
+      INV[InvoiceDetails]:::entity
+      I_BOT1([Due_Date]):::attr
+      I_BOT2([Dispatch_through]):::attr
+      I_BOT3([Date]):::attr
+      I_BOT4([Invoice Number]):::attr
+      I_BOT5([Invoice Type]):::attr
+      I_BOT6([Cus_name]):::attr
+
+      INV --- I_TOP1
+      INV --- I_TOP2
+      INV --- I_TOP3
+      INV --- I_TOP4
+      INV --- I_TOP5
+      INV --- I_BOT1
+      INV --- I_BOT2
+      INV --- I_BOT3
+      INV --- I_BOT4
+      INV --- I_BOT5
+      INV --- I_BOT6
+    end
+  end
+
+  ORG --- HAVE --- CUST
+  ORG --- MANAGE
+  MANAGE --- PROD
+  PROD --- FOR --- INV
+  CUST --- VIEW --- INV
+
+  TITLE["Fig 5.1.5: ER Diagram"]:::entity
+  BOTTOMROW --- TITLE
+```

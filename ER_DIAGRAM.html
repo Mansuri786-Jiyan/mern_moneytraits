@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ER Diagram</title>
+  <style>
+    body {
+      margin: 0;
+      background: #242424;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      font-family: "Times New Roman", serif;
+    }
+    svg {
+      width: 1400px;
+      height: 980px;
+      background: #242424;
+    }
+    .entity {
+      fill: #f5f5f5;
+      stroke: #111;
+      stroke-width: 2;
+    }
+    .relation {
+      fill: #f5f5f5;
+      stroke: #111;
+      stroke-width: 2;
+    }
+    .attr {
+      fill: #f5f5f5;
+      stroke: #111;
+      stroke-width: 1.6;
+    }
+    .line {
+      stroke: #111;
+      stroke-width: 1.8;
+      fill: none;
+    }
+    .label {
+      fill: #111;
+      font-size: 29px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .attr-label {
+      fill: #111;
+      font-size: 20px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+    .caption {
+      fill: #f5f5f5;
+      font-size: 48px;
+      font-weight: 600;
+      text-anchor: middle;
+    }
+  </style>
+</head>
+<body>
+  <svg viewBox="0 0 2400 1600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Entities -->
+    <rect class="entity" x="420" y="390" width="300" height="90" />
+    <text class="label" x="570" y="435">OrganizationDetails</text>
+
+    <rect class="entity" x="1500" y="390" width="270" height="90" />
+    <text class="label" x="1635" y="435">Product</text>
+
+    <rect class="entity" x="420" y="900" width="300" height="90" />
+    <text class="label" x="570" y="945">CustomerDetails</text>
+
+    <rect class="entity" x="1500" y="900" width="270" height="90" />
+    <text class="label" x="1635" y="945">InvoiceDetails</text>
+
+    <!-- Relations -->
+    <polygon class="relation" points="570,640 640,710 570,780 500,710" />
+    <text class="label" x="570" y="710">have</text>
+
+    <polygon class="relation" points="940,640 1010,710 940,780 870,710" />
+    <text class="label" x="940" y="710">Manage</text>
+
+    <polygon class="relation" points="1635,640 1705,710 1635,780 1565,710" />
+    <text class="label" x="1635" y="710">for</text>
+
+    <polygon class="relation" points="1220,900 1290,970 1220,1040 1150,970" />
+    <text class="label" x="1220" y="945">view/</text>
+    <text class="label" x="1220" y="990">Download</text>
+
+    <!-- Main connectors -->
+    <line class="line" x1="570" y1="480" x2="570" y2="640" />
+    <line class="line" x1="570" y1="780" x2="570" y2="900" />
+
+    <line class="line" x1="720" y1="435" x2="870" y2="710" />
+    <line class="line" x1="1010" y1="710" x2="1500" y2="435" />
+    <line class="line" x1="1010" y1="710" x2="1500" y2="945" />
+
+    <line class="line" x1="1635" y1="480" x2="1635" y2="640" />
+    <line class="line" x1="1635" y1="780" x2="1635" y2="900" />
+
+    <line class="line" x1="720" y1="945" x2="1150" y2="970" />
+    <line class="line" x1="1290" y1="970" x2="1500" y2="945" />
+
+    <!-- Organization attributes -->
+    <g>
+      <ellipse class="attr" cx="370" cy="510" rx="95" ry="33" /><text class="attr-label" x="370" y="510">Address2</text>
+      <ellipse class="attr" cx="320" cy="570" rx="95" ry="33" /><text class="attr-label" x="320" y="570">Address1</text>
+      <ellipse class="attr" cx="280" cy="630" rx="110" ry="33" /><text class="attr-label" x="280" y="630">GSTIN Number</text>
+      <ellipse class="attr" cx="260" cy="690" rx="100" ry="33" /><text class="attr-label" x="260" y="690">PAN Number</text>
+      <ellipse class="attr" cx="280" cy="750" rx="105" ry="33" /><text class="attr-label" x="280" y="750">Company Type</text>
+      <ellipse class="attr" cx="320" cy="810" rx="115" ry="33" /><text class="attr-label" x="320" y="810">Company Name</text>
+      <ellipse class="attr" cx="380" cy="870" rx="105" ry="33" /><text class="attr-label" x="380" y="870">Owner Name</text>
+
+      <ellipse class="attr" cx="560" cy="220" rx="70" ry="31" /><text class="attr-label" x="560" y="220">City</text>
+      <ellipse class="attr" cx="490" cy="270" rx="70" ry="31" /><text class="attr-label" x="490" y="270">State</text>
+      <ellipse class="attr" cx="670" cy="270" rx="90" ry="31" /><text class="attr-label" x="670" y="270">Pincode</text>
+      <ellipse class="attr" cx="740" cy="330" rx="80" ry="31" /><text class="attr-label" x="740" y="330">Email</text>
+      <ellipse class="attr" cx="760" cy="390" rx="78" ry="31" /><text class="attr-label" x="760" y="390">UserID</text>
+      <ellipse class="attr" cx="760" cy="450" rx="90" ry="31" /><text class="attr-label" x="760" y="450">Password1</text>
+      <ellipse class="attr" cx="760" cy="510" rx="90" ry="31" /><text class="attr-label" x="760" y="510">Password2</text>
+
+      <line class="line" x1="470" y1="480" x2="370" y2="510" />
+      <line class="line" x1="460" y1="485" x2="320" y2="570" />
+      <line class="line" x1="450" y1="495" x2="280" y2="630" />
+      <line class="line" x1="445" y1="505" x2="260" y2="690" />
+      <line class="line" x1="450" y1="515" x2="280" y2="750" />
+      <line class="line" x1="465" y1="525" x2="320" y2="810" />
+      <line class="line" x1="490" y1="535" x2="380" y2="870" />
+
+      <line class="line" x1="560" y1="390" x2="560" y2="252" />
+      <line class="line" x1="550" y1="390" x2="490" y2="300" />
+      <line class="line" x1="580" y1="390" x2="670" y2="300" />
+      <line class="line" x1="610" y1="390" x2="740" y2="360" />
+      <line class="line" x1="620" y1="410" x2="760" y2="390" />
+      <line class="line" x1="620" y1="430" x2="760" y2="450" />
+      <line class="line" x1="610" y1="450" x2="760" y2="510" />
+    </g>
+
+    <!-- Product attributes -->
+    <g>
+      <ellipse class="attr" cx="1690" cy="250" rx="95" ry="33" /><text class="attr-label" x="1690" y="250">Discount</text>
+      <ellipse class="attr" cx="1570" cy="290" rx="75" ry="33" /><text class="attr-label" x="1570" y="290">CGST</text>
+      <ellipse class="attr" cx="1805" cy="290" rx="80" ry="33" /><text class="attr-label" x="1805" y="290">Price</text>
+      <ellipse class="attr" cx="1505" cy="340" rx="75" ry="33" /><text class="attr-label" x="1505" y="340">SGST</text>
+      <ellipse class="attr" cx="1640" cy="340" rx="70" ry="33" /><text class="attr-label" x="1640" y="340">IGST</text>
+      <ellipse class="attr" cx="1860" cy="340" rx="100" ry="33" /><text class="attr-label" x="1860" y="340">HSN Code</text>
+      <ellipse class="attr" cx="1930" cy="420" rx="120" ry="33" /><text class="attr-label" x="1930" y="420">Product Name</text>
+      <ellipse class="attr" cx="1940" cy="500" rx="95" ry="33" /><text class="attr-label" x="1940" y="500">Invoice</text>
+      <ellipse class="attr" cx="1400" cy="450" rx="75" ry="33" /><text class="attr-label" x="1400" y="450">Total</text>
+
+      <line class="line" x1="1620" y1="390" x2="1690" y2="283" />
+      <line class="line" x1="1610" y1="390" x2="1570" y2="323" />
+      <line class="line" x1="1650" y1="390" x2="1805" y2="323" />
+      <line class="line" x1="1600" y1="400" x2="1505" y2="370" />
+      <line class="line" x1="1630" y1="390" x2="1640" y2="373" />
+      <line class="line" x1="1660" y1="400" x2="1860" y2="370" />
+      <line class="line" x1="1700" y1="430" x2="1930" y2="420" />
+      <line class="line" x1="1700" y1="450" x2="1940" y2="500" />
+      <line class="line" x1="1570" y1="440" x2="1400" y2="450" />
+    </g>
+
+    <!-- Customer attributes -->
+    <g>
+      <ellipse class="attr" cx="510" cy="790" rx="115" ry="33" /><text class="attr-label" x="510" y="790">Company Name</text>
+      <ellipse class="attr" cx="370" cy="850" rx="90" ry="33" /><text class="attr-label" x="370" y="850">Cus_name</text>
+      <ellipse class="attr" cx="330" cy="910" rx="105" ry="33" /><text class="attr-label" x="330" y="910">Contact Person</text>
+      <ellipse class="attr" cx="330" cy="970" rx="110" ry="33" /><text class="attr-label" x="330" y="970">Contact Number</text>
+      <ellipse class="attr" cx="370" cy="1030" rx="105" ry="33" /><text class="attr-label" x="370" y="1030">Company Type</text>
+      <ellipse class="attr" cx="430" cy="1090" rx="90" ry="33" /><text class="attr-label" x="430" y="1090">Address1</text>
+      <ellipse class="attr" cx="500" cy="1150" rx="90" ry="33" /><text class="attr-label" x="500" y="1150">Address2</text>
+      <ellipse class="attr" cx="590" cy="1210" rx="95" ry="33" /><text class="attr-label" x="590" y="1210">Land Mark</text>
+
+      <ellipse class="attr" cx="760" cy="1150" rx="95" ry="33" /><text class="attr-label" x="760" y="1150">Country</text>
+      <ellipse class="attr" cx="830" cy="1090" rx="80" ry="33" /><text class="attr-label" x="830" y="1090">State</text>
+      <ellipse class="attr" cx="900" cy="1030" rx="70" ry="33" /><text class="attr-label" x="900" y="1030">City</text>
+      <ellipse class="attr" cx="970" cy="970" rx="90" ry="33" /><text class="attr-label" x="970" y="970">Pincode</text>
+
+      <line class="line" x1="570" y1="900" x2="510" y2="823" />
+      <line class="line" x1="530" y1="900" x2="370" y2="850" />
+      <line class="line" x1="520" y1="920" x2="330" y2="910" />
+      <line class="line" x1="520" y1="940" x2="330" y2="970" />
+      <line class="line" x1="525" y1="960" x2="370" y2="1030" />
+      <line class="line" x1="540" y1="980" x2="430" y2="1090" />
+      <line class="line" x1="560" y1="990" x2="500" y2="1150" />
+      <line class="line" x1="580" y1="990" x2="590" y2="1210" />
+
+      <line class="line" x1="600" y1="990" x2="760" y2="1150" />
+      <line class="line" x1="620" y1="980" x2="830" y2="1090" />
+      <line class="line" x1="630" y1="960" x2="900" y2="1030" />
+      <line class="line" x1="640" y1="940" x2="970" y2="970" />
+    </g>
+
+    <!-- Invoice attributes -->
+    <g>
+      <ellipse class="attr" cx="1930" cy="790" rx="115" ry="33" /><text class="attr-label" x="1930" y="790">Document Note</text>
+      <ellipse class="attr" cx="2000" cy="850" rx="75" ry="33" /><text class="attr-label" x="2000" y="850">T_C</text>
+      <ellipse class="attr" cx="2000" cy="910" rx="105" ry="33" /><text class="attr-label" x="2000" y="910">Payment_note</text>
+      <ellipse class="attr" cx="1990" cy="970" rx="110" ry="33" /><text class="attr-label" x="1990" y="970">Payment Type</text>
+      <ellipse class="attr" cx="1930" cy="1030" rx="70" ry="33" /><text class="attr-label" x="1930" y="1030">Bank</text>
+      <ellipse class="attr" cx="1870" cy="1090" rx="90" ry="33" /><text class="attr-label" x="1870" y="1090">Due_Date</text>
+      <ellipse class="attr" cx="1800" cy="1150" rx="120" ry="33" /><text class="attr-label" x="1800" y="1150">Dispatch_through</text>
+      <ellipse class="attr" cx="1710" cy="1210" rx="70" ry="33" /><text class="attr-label" x="1710" y="1210">Date</text>
+      <ellipse class="attr" cx="1620" cy="1240" rx="115" ry="33" /><text class="attr-label" x="1620" y="1240">Invoice Number</text>
+      <ellipse class="attr" cx="1510" cy="1210" rx="95" ry="33" /><text class="attr-label" x="1510" y="1210">Invoice Type</text>
+      <ellipse class="attr" cx="1410" cy="1150" rx="95" ry="33" /><text class="attr-label" x="1410" y="1150">Cus_name</text>
+
+      <line class="line" x1="1650" y1="900" x2="1930" y2="790" />
+      <line class="line" x1="1660" y1="910" x2="2000" y2="850" />
+      <line class="line" x1="1670" y1="920" x2="2000" y2="910" />
+      <line class="line" x1="1680" y1="940" x2="1990" y2="970" />
+      <line class="line" x1="1670" y1="960" x2="1930" y2="1030" />
+      <line class="line" x1="1660" y1="980" x2="1870" y2="1090" />
+      <line class="line" x1="1645" y1="990" x2="1800" y2="1150" />
+      <line class="line" x1="1630" y1="990" x2="1710" y2="1210" />
+      <line class="line" x1="1615" y1="990" x2="1620" y2="1240" />
+      <line class="line" x1="1600" y1="990" x2="1510" y2="1210" />
+      <line class="line" x1="1585" y1="990" x2="1410" y2="1150" />
+    </g>
+
+    <text class="caption" x="1200" y="1520">Fig 5.1.5: ER Diagram</text>
+  </svg>
+</body>
+</html>

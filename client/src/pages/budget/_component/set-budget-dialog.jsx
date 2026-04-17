@@ -40,7 +40,7 @@ const formSchema = z.object({
 const SetBudgetDialog = ({ open, onClose, editData }) => {
   const [setBudget, { isLoading }] = useSetBudgetMutation();
   const { data: categoriesData } = useGetCategoriesQuery();
-  const categories = categoriesData?.data || [];
+  const categories = categoriesData?.categories || [];
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -111,8 +111,8 @@ const SetBudgetDialog = ({ open, onClose, editData }) => {
                     </FormControl>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat.name || "unnamed"}>
-                          {cat.name ? (cat.name.charAt(0).toUpperCase() + cat.name.slice(1)) : "Unnamed"}
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
                         </SelectItem>
                       ))}
 

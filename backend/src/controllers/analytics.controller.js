@@ -10,9 +10,7 @@ export const summaryAnalyticsController = asyncHandler(async (req, res) => {
         customFrom: from ? new Date(from) : undefined,
         customTo: to ? new Date(to) : undefined,
     };
-    console.log("Analytics Debug: Fetching summary for userId:", userId, "preset:", preset);
     const stats = await summaryAnalyticsService(userId, filter.dateRangePreset, filter.customFrom, filter.customTo);
-    console.log("Analytics Debug: Result stats:", JSON.stringify(stats, null, 2));
     return res.status(HTTPSTATUS.OK).json({
         message: "Summary fetched successfully",
         data: stats,

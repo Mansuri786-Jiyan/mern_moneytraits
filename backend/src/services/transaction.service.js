@@ -219,7 +219,6 @@ export const scanReceiptService = async (file) => {
             throw new BadRequestException("Could not process file to base64");
         }
 
-        console.log("Preparing Gemini AI request...");
         const result = await genAI.models.generateContent({
             model: genAIModel,
             contents: [
@@ -245,8 +244,6 @@ export const scanReceiptService = async (file) => {
 
         // The @google/genai SDK returns result.text for non-streaming calls
         const rawText = result.text || (typeof result.response?.text === 'function' ? await result.response.text() : "");
-        
-        console.log("Gemini Raw Response:", rawText);
 
         // Remove markdown formatting if Gemini returns it
         const cleanedText = rawText?.replace(/```json|```/g, "").trim();
