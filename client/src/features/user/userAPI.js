@@ -8,6 +8,39 @@ export const userApi = apiClient.injectEndpoints({
                 body: formData,
             }),
         }),
+        changePassword: builder.mutation({
+            query: (data) => ({
+                url: "/user/password",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+        deleteAccount: builder.mutation({
+            query: () => ({
+                url: "/user/account",
+                method: "DELETE",
+            }),
+        }),
+        requestEmailUpdate: builder.mutation({
+            query: (data) => ({
+                url: "/user/email/request-update",
+                method: "POST",
+                body: data,
+            }),
+        }),
+        verifyEmailUpdate: builder.mutation({
+            query: (data) => ({
+                url: "/user/email/verify-update",
+                method: "POST",
+                body: data,
+            }),
+        }),
     }),
 });
-export const { useUpdateUserMutation } = userApi;
+export const { 
+    useUpdateUserMutation, 
+    useChangePasswordMutation, 
+    useDeleteAccountMutation,
+    useRequestEmailUpdateMutation,
+    useVerifyEmailUpdateMutation
+} = userApi;

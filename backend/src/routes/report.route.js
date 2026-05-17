@@ -5,7 +5,7 @@ const reportRoutes = Router();
 
 reportRoutes.get("/all", getAllReportsController);
 reportRoutes.get("/generate", generateReportController);
-reportRoutes.get("/send-now", sendReportNowController);
+reportRoutes.post("/send-now", sendReportNowController);
 reportRoutes.post("/update-setting", updateReportSettingController);
 reportRoutes.post("/email", emailReportController);
 

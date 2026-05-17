@@ -15,6 +15,8 @@ import {
   Loader,
   RefreshCw,
   MoreVertical,
+  Mail,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -44,6 +46,10 @@ import {
   useDuplicateTransactionMutation,
 } from "@/features/transaction/transactionAPI";
 import { useGetCategoriesQuery } from "@/features/category/categoryAPI";
+import { useSendReportNowMutation } from "@/features/report/reportAPI";
+import { useTypedSelector } from "@/app/hook";
+import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import useEditTransactionDrawer from "@/hooks/use-edit-transaction-drawer";
 
@@ -62,6 +68,18 @@ const PremiumTransactionTable = ({
   const [keyword, setKeyword] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
 
+  // Statement States
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [appliedFromDate, setAppliedFromDate] = useState(null);
+  const [appliedToDate, setAppliedToDate] = useState(null);
+  const [isSending, setIsSending] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [localPage, setLocalPage] = useState(1);
+
+  const { accessToken, user } = useTypedSelector((state) => state.auth);
+  const [sendReportNow] = useSendReportNowMutation();
+
   // Hooks for actions
   const { onOpenDrawer } = useEditTransactionDrawer();
   const [duplicateTransaction, { isLoading: isDuplicating }] =
@@ -73,21 +91,53 @@ const PremiumTransactionTable = ({
   const { data: categoriesData } = useGetCategoriesQuery();
   const allCategories = categoriesData?.categories || [];
 
+  const isDateFilterActive = !!(appliedFromDate || appliedToDate);
+
   const { data, isFetching } = useGetAllTransactionsQuery({
     keyword,
     type: filter.type,
     recurringStatus: filter.recurringStatus,
     category: filter.category,
-    pageNumber: filter.pageNumber,
-    pageSize: filter.pageSize,
+    pageNumber: isDateFilterActive ? 1 : filter.pageNumber,
+    pageSize: isDateFilterActive ? 1000 : filter.pageSize,
   });
 
   const transactions = data?.transactions || data?.data?.transactions || [];
-  const pagination = {
-    totalItems: data?.pagination?.totalCount || 0,
-    totalPages: data?.pagination?.totalPages || 0,
-    pageNumber: filter.pageNumber,
-    pageSize: filter.pageSize,
+
+  // Filter transactions locally
+  const filteredTransactions = transactions.filter((tx) => {
+    if (!appliedFromDate && !appliedToDate) return true;
+    
+    const txDate = new Date(tx.date);
+    
+    if (appliedFromDate) {
+      const startOfApplied = new Date(appliedFromDate);
+      startOfApplied.setHours(0, 0, 0, 0);
+      if (txDate < startOfApplied) return false;
+    }
+    
+    if (appliedToDate) {
+      const endOfApplied = new Date(appliedToDate);
+      endOfApplied.setHours(23, 59, 59, 999);
+      if (txDate > endOfApplied) return false;
+    }
+    
+    return true;
+  });
+
+  const localPageSize = pageSize;
+  const totalItems = isDateFilterActive ? filteredTransactions.length : (data?.pagination?.totalCount || 0);
+  const totalPages = isDateFilterActive ? Math.ceil(totalItems / localPageSize) : (data?.pagination?.totalPages || 0);
+
+  const displayTransactions = isDateFilterActive
+    ? filteredTransactions.slice((localPage - 1) * localPageSize, localPage * localPageSize)
+    : filteredTransactions;
+
+  const displayPagination = {
+    totalItems,
+    totalPages,
+    pageNumber: isDateFilterActive ? localPage : filter.pageNumber,
+    pageSize: localPageSize,
   };
 
   // Notify parent about filters
@@ -100,11 +150,176 @@ const PremiumTransactionTable = ({
     });
   }, [keyword, filter.type, filter.recurringStatus, filter.category, onFiltersChange]);
 
+  // Reset local page on filter changes
+  useEffect(() => {
+    setLocalPage(1);
+  }, [keyword, filter.type, filter.recurringStatus, filter.category, appliedFromDate, appliedToDate]);
+
+  const handleSendEmail = async () => {
+    if (!fromDate || !toDate) return;
+    setIsSending(true);
+    try {
+      await sendReportNow({
+        from: fromDate.toISOString(),
+        to: toDate.toISOString(),
+      }).unwrap();
+      toast.success(`Statement report sent to ${user?.email}`);
+    } catch (error) {
+      console.error("Send email error:", error);
+      toast.error(error?.data?.message || "Failed to send report email");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handlePrintPDF = async () => {
+    if (!fromDate || !toDate) return;
+    setIsDownloading(true);
+    try {
+      const baseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:8010/api";
+      const url = `${baseUrl}/report/generate?from=${fromDate.toISOString()}&to=${toDate.toISOString()}`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        toast.error(json.message || "No transactions in this period");
+        setIsDownloading(false);
+        return;
+      }
+
+      const activeReportData = json.data;
+
+      const printArea = document.createElement("div");
+      printArea.id = "report-print-area";
+      printArea.style.fontFamily = "Arial, sans-serif";
+      printArea.style.padding = "40px";
+      printArea.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #00bc7d; margin: 0; font-size: 32px;">Moneytraits</h1>
+          <p style="color: #666; font-size: 14px; margin-top: 5px;">Your personal companion for finance</p>
+        </div>
+        <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Financial Report — ${
+          activeReportData.period
+        }</h2>
+        
+        <div style="margin-bottom: 30px;">
+          <p><strong>Generated for:</strong> ${user?.name} (${user?.email})</p>
+          <p><strong>Date range:</strong> ${activeReportData.period}</p>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd;">
+          <tr style="background-color: #f9f9f9;">
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Category</th>
+            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Details</th>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Income</strong></td>
+            <td style="border: 1px solid #ddd; padding: 12px; color: #22c55e; font-weight: bold;">${formatCurrency(
+              activeReportData.summary.income
+            )}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Expenses</strong></td>
+            <td style="border: 1px solid #ddd; padding: 12px; color: #ef4444; font-weight: bold;">${formatCurrency(
+              activeReportData.summary.expenses
+            )}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Net Balance</strong></td>
+            <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">${formatCurrency(
+              activeReportData.summary.balance
+            )}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Savings Rate</strong></td>
+            <td style="border: 1px solid #ddd; padding: 12px;">${
+              activeReportData.summary.savingsRate
+            }%</td>
+          </tr>
+        </table>
+
+        ${
+          activeReportData.summary.topCategories.length > 0
+            ? `
+          <h3 style="margin-top: 30px; margin-bottom: 15px;">Top Spending Categories</h3>
+          <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+            <thead>
+              <tr style="background-color: #f9f9f9;">
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Category</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Percentage</th>
+                <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${activeReportData.summary.topCategories
+                .map(
+                  (cat) => `
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 12px; text-transform: capitalize;">${cat.name}</td>
+                  <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${cat.percent}%</td>
+                  <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${formatCurrency(
+                    cat.amount
+                  )}</td>
+                </tr>
+              `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `
+            : ""
+        }
+
+        ${
+          activeReportData.insights && activeReportData.insights.length > 0
+            ? `
+          <h3 style="margin-top: 30px; margin-bottom: 15px;">AI Insights</h3>
+          <ul style="padding-left: 20px; color: #444;">
+            ${activeReportData.insights
+              .map(
+                (insight) => `
+              <li style="margin-bottom: 8px;">${insight}</li>
+            `
+              )
+              .join("")}
+          </ul>
+        `
+            : ""
+        }
+
+        <div style="margin-top: 50px; text-align: center; color: #888; font-size: 11px; border-top: 1px solid #eee; padding-top: 20px;">
+          <p>© ${new Date().getFullYear()} Moneytraits - Secure Personal Finance Management</p>
+          <p>Generated on ${format(new Date(), "MMMM dd, yyyy")}</p>
+        </div>
+      `;
+
+      document.body.appendChild(printArea);
+      window.print();
+      setIsDownloading(false);
+
+      window.onafterprint = () => {
+        document.getElementById("report-print-area")?.remove();
+      };
+
+    } catch (error) {
+      console.error("Print PDF error:", error);
+      toast.error("Failed to generate PDF statement.");
+      setIsDownloading(false);
+    }
+  };
+
   const toggleSelectAll = () => {
-    if (selectedRows.length === transactions.length) {
+    if (selectedRows.length === displayTransactions.length) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(transactions.map((t) => t._id || t.id));
+      setSelectedRows(displayTransactions.map((t) => t._id || t.id));
     }
   };
 
@@ -148,105 +363,226 @@ const PremiumTransactionTable = ({
   return (
     <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-4 rounded-2xl">
-        <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 dark:text-slate-400 group-focus-within:text-slate-900 dark:group-focus-within:text-white transition-colors" />
-          <Input
-            placeholder="Search transactions..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="pl-10 h-11 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 focus:border-slate-300 dark:focus:border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl transition-all"
-          />
+      <div className="flex flex-col gap-4 bg-white/50 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-5 rounded-2xl shadow-sm">
+        {/* Row 1: Search and Dropdowns */}
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 dark:text-slate-400 group-focus-within:text-slate-900 dark:group-focus-within:text-white transition-colors" />
+            <Input
+              placeholder="Search transactions..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="pl-10 h-11 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 focus:border-slate-300 dark:focus:border-white/20 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl transition-all"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              value={filter.type || "ALL"}
+              onValueChange={(val) =>
+                setFilter((p) => ({
+                  ...p,
+                  type: val === "ALL" ? undefined : val,
+                  pageNumber: 1,
+                }))
+              }
+            >
+              <SelectTrigger className="h-11 w-[130px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-3.5 w-3.5" />
+                  <SelectValue placeholder="All Types" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
+                <SelectItem value="ALL">All Types</SelectItem>
+                <SelectItem value={_TRANSACTION_TYPE.INCOME}>Income</SelectItem>
+                <SelectItem value={_TRANSACTION_TYPE.EXPENSE}>Expense</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filter.recurringStatus || "ALL"}
+              onValueChange={(val) =>
+                setFilter((p) => ({
+                  ...p,
+                  recurringStatus: val === "ALL" ? undefined : val,
+                  pageNumber: 1,
+                }))
+              }
+            >
+              <SelectTrigger className="h-11 w-[140px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
+                <SelectValue placeholder="Frequency" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
+                <SelectItem value="ALL">All Frequency</SelectItem>
+                <SelectItem value="RECURRING">Recurring</SelectItem>
+                <SelectItem value="NON_RECURRING">One-time</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={filter.category || "ALL"}
+              onValueChange={(val) =>
+                setFilter((p) => ({
+                  ...p,
+                  category: val === "ALL" ? undefined : val,
+                  pageNumber: 1,
+                }))
+              }
+            >
+              <SelectTrigger className="h-11 w-[160px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 max-h-[280px]">
+                <SelectItem value="ALL">All Categories</SelectItem>
+                {allCategories.map((cat) => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    <div className="flex items-center gap-2">
+                      {cat.color && (
+                        <span
+                          className="inline-block w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: cat.color }}
+                        />
+                      )}
+                      <span className="capitalize">{cat.label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {selectedRows.length > 0 && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleBulkDelete}
+                disabled={isBulkDeleting}
+                className="h-11 rounded-xl px-5 flex items-center gap-2 animate-in zoom-in-95"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete {selectedRows.length}
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Select
-            value={filter.type || "ALL"}
-            onValueChange={(val) =>
-              setFilter((p) => ({
-                ...p,
-                type: val === "ALL" ? undefined : val,
-                pageNumber: 1,
-              }))
-            }
-          >
-            <SelectTrigger className="h-11 w-[140px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
-              <div className="flex items-center gap-2">
-                <Filter className="h-3.5 w-3.5" />
-                <SelectValue placeholder="All Types" />
+        {/* Row 2: Custom Dates + Apply + Action Buttons */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 pt-3 border-t border-slate-200/50 dark:border-white/5">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-[150px]">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal h-10 rounded-xl bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300",
+                        !fromDate && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                      {fromDate ? format(fromDate, "MMM dd, yyyy") : "From Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <ShadcnCalendar
+                      mode="single"
+                      selected={fromDate}
+                      onSelect={setFromDate}
+                      disabled={(date) => date > new Date()}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
-              <SelectItem value="ALL">All Types</SelectItem>
-              <SelectItem value={_TRANSACTION_TYPE.INCOME}>Income</SelectItem>
-              <SelectItem value={_TRANSACTION_TYPE.EXPENSE}>Expense</SelectItem>
-            </SelectContent>
-          </Select>
 
-          <Select
-            value={filter.recurringStatus || "ALL"}
-            onValueChange={(val) =>
-              setFilter((p) => ({
-                ...p,
-                recurringStatus: val === "ALL" ? undefined : val,
-                pageNumber: 1,
-              }))
-            }
-          >
-            <SelectTrigger className="h-11 w-[160px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
-              <SelectValue placeholder="Frequency" />
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
-              <SelectItem value="ALL">All Frequency</SelectItem>
-              <SelectItem value="RECURRING">Recurring</SelectItem>
-              <SelectItem value="NON_RECURRING">One-time</SelectItem>
-            </SelectContent>
-          </Select>
+              <span className="text-slate-400 dark:text-slate-600 text-xs">to</span>
 
-          {/* Category Filter */}
-          <Select
-            value={filter.category || "ALL"}
-            onValueChange={(val) =>
-              setFilter((p) => ({
-                ...p,
-                category: val === "ALL" ? undefined : val,
-                pageNumber: 1,
-              }))
-            }
-          >
-            <SelectTrigger className="h-11 w-[160px] bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl focus:ring-0 transition-colors">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent className="bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 max-h-[280px]">
-              <SelectItem value="ALL">All Categories</SelectItem>
-              {allCategories.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  <div className="flex items-center gap-2">
-                    {cat.color && (
-                      <span
-                        className="inline-block w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                    )}
-                    <span className="capitalize">{cat.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <div className="w-[150px]">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal h-10 rounded-xl bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300",
+                        !toDate && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-3.5 w-3.5 text-slate-400" />
+                      {toDate ? format(toDate, "MMM dd, yyyy") : "To Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <ShadcnCalendar
+                      mode="single"
+                      selected={toDate}
+                      onSelect={setToDate}
+                      disabled={(date) =>
+                        date > new Date() || (fromDate && date < fromDate)
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
 
-          {selectedRows.length > 0 && (
             <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleBulkDelete}
-              disabled={isBulkDeleting}
-              className="h-11 rounded-xl px-5 flex items-center gap-2 animate-in zoom-in-95"
+              onClick={() => {
+                setAppliedFromDate(fromDate);
+                setAppliedToDate(toDate);
+                setLocalPage(1);
+              }}
+              className="h-10 rounded-xl px-4 !text-white bg-emerald-600 hover:bg-emerald-500 shadow-sm transition-all"
             >
-              <Trash2 className="h-4 w-4" />
-              Delete {selectedRows.length}
+              Apply Filter
             </Button>
-          )}
+
+            {(appliedFromDate || appliedToDate) && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setFromDate(null);
+                  setToDate(null);
+                  setAppliedFromDate(null);
+                  setAppliedToDate(null);
+                  setLocalPage(1);
+                }}
+                className="h-10 rounded-xl px-3 text-xs text-rose-500 hover:text-rose-400 hover:bg-rose-500/10"
+              >
+                Clear Date Filter
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleSendEmail}
+              disabled={!fromDate || !toDate || isSending}
+              className="flex-1 lg:flex-none h-10 rounded-xl px-4 !text-white bg-[#00bc7d] hover:bg-[#00bc7d]/90 shadow-md flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              {isSending ? (
+                <Loader className="h-4 w-4 animate-spin" />
+              ) : (
+                <Mail className="h-4 w-4" />
+              )}
+              {isSending ? "Sending..." : "Email Statement"}
+            </Button>
+
+            <Button
+              onClick={handlePrintPDF}
+              disabled={!fromDate || !toDate || isDownloading}
+              variant="outline"
+              className="flex-1 lg:flex-none h-10 rounded-xl px-4 shadow-sm border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 active:scale-95 transition-all"
+            >
+              {isDownloading ? (
+                <Loader className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {isDownloading ? "Preparing..." : "Download PDF"}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -261,7 +597,7 @@ const PremiumTransactionTable = ({
                   <Checkbox
                     checked={
                       selectedRows.length > 0 &&
-                      selectedRows.length === transactions.length
+                      selectedRows.length === displayTransactions.length
                     }
                     onCheckedChange={toggleSelectAll}
                     className="border-slate-400 dark:border-white/30 data-[state=checked]:bg-slate-900 dark:data-[state=checked]:bg-slate-100 data-[state=checked]:text-white dark:data-[state=checked]:text-slate-900"
@@ -302,14 +638,24 @@ const PremiumTransactionTable = ({
                 </tr>
               )}
 
-              {transactions.length === 0 && !isFetching ? (
+              {displayTransactions.length === 0 && !isFetching ? (
                 <tr>
-                  <td colSpan="8" className="px-6 py-20 text-center text-slate-500">
-                    No transactions found
+                  <td colSpan="8" className="px-6 py-32 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                      <div className="h-20 w-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                        <CreditCard className="h-10 w-10 text-slate-400 dark:text-slate-500" />
+                      </div>
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">No Transactions Yet</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mx-auto">
+                          You haven't logged any transactions. Click "Add Transaction" or "Scan Receipt" above to start building your financial dashboard!
+                        </p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                transactions.map((tx) => (
+                displayTransactions.map((tx) => (
                   <tr
                     key={tx._id || tx.id}
                     className="hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors group cursor-default"
@@ -398,17 +744,25 @@ const PremiumTransactionTable = ({
 
         {/* MOBILE CARD VIEW */}
         <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
-          {isFetching && transactions.length === 0 && (
+          {isFetching && displayTransactions.length === 0 && (
             <div className="py-20 flex justify-center">
               <Loader className="h-8 w-8 animate-spin text-slate-500" />
             </div>
           )}
-          {transactions.length === 0 && !isFetching && (
-            <div className="py-20 text-center text-slate-500 text-sm">
-              No transactions found
+          {displayTransactions.length === 0 && !isFetching && (
+            <div className="py-24 px-6 text-center flex flex-col items-center justify-center space-y-4">
+              <div className="h-16 w-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+                <CreditCard className="h-8 w-8 text-slate-400 dark:text-slate-500" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200">No Transactions Yet</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-xs">
+                  Click the add button above to start logging your expenses!
+                </p>
+              </div>
             </div>
           )}
-          {transactions.map((tx) => (
+          {displayTransactions.map((tx) => (
             <div
               key={tx._id || tx.id}
               className="p-5 space-y-4 hover:bg-slate-50 dark:hover:bg-white/[0.02] bg-white dark:bg-white/[0.01] transition-colors relative group"
@@ -508,41 +862,50 @@ const PremiumTransactionTable = ({
         </div>
 
         {/* PAGINATION */}
-        {isShowPagination && pagination.totalPages > 1 && (
+        {isShowPagination && displayPagination.totalPages > 1 && (
           <div className="px-6 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/[0.02] flex items-center justify-between">
             <span className="text-xs text-slate-500 dark:text-slate-500">
               Page{" "}
               <span className="text-slate-900 dark:text-white">
-                {pagination.pageNumber}
+                {displayPagination.pageNumber}
               </span>{" "}
-              of {pagination.totalPages}
+              of {displayPagination.totalPages}
             </span>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                disabled={pagination.pageNumber === 1 || isFetching}
-                onClick={() => setFilter((p) => ({ ...p, pageNumber: p.pageNumber - 1 }))}
+                disabled={displayPagination.pageNumber === 1 || isFetching}
+                onClick={() =>
+                  isDateFilterActive
+                    ? setLocalPage((p) => p - 1)
+                    : setFilter((p) => ({ ...p, pageNumber: p.pageNumber - 1 }))
+                }
                 className="h-9 w-9 p-0 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <div className="flex items-center gap-1 px-1">
-                {[...Array(pagination.totalPages)].map((_, i) => {
+                {[...Array(displayPagination.totalPages)].map((_, i) => {
                   const pNum = i + 1;
                   // Only show a few page numbers
                   if (
                     pNum === 1 ||
-                    pNum === pagination.totalPages ||
-                    (pNum >= pagination.pageNumber - 1 && pNum <= pagination.pageNumber + 1)
+                    pNum === displayPagination.totalPages ||
+                    (pNum >= displayPagination.pageNumber - 1 &&
+                      pNum <= displayPagination.pageNumber + 1)
                   ) {
                     return (
                       <button
                         key={pNum}
-                        onClick={() => setFilter((p) => ({ ...p, pageNumber: pNum }))}
+                        onClick={() =>
+                          isDateFilterActive
+                            ? setLocalPage(pNum)
+                            : setFilter((p) => ({ ...p, pageNumber: pNum }))
+                        }
                         className={cn(
                           "h-8 w-8 text-[11px] font-bold rounded-lg transition-all",
-                          pagination.pageNumber === pNum
+                          displayPagination.pageNumber === pNum
                             ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg shadow-slate-200 dark:shadow-white/10"
                             : "text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                         )}
@@ -551,9 +914,12 @@ const PremiumTransactionTable = ({
                       </button>
                     );
                   }
-                  if (pNum === pagination.pageNumber - 2 || pNum === pagination.pageNumber + 2) {
+                  if (
+                    pNum === displayPagination.pageNumber - 2 ||
+                    pNum === displayPagination.pageNumber + 2
+                  ) {
                     return (
-                      <span key={pNum} className="text-slate-600 px-1 text-[10px]">
+                      <span key={pNum} className="text-slate-400 px-1 text-[10px]">
                         ...
                       </span>
                     );
@@ -564,8 +930,15 @@ const PremiumTransactionTable = ({
               <Button
                 variant="ghost"
                 size="sm"
-                disabled={pagination.pageNumber === pagination.totalPages || isFetching}
-                onClick={() => setFilter((p) => ({ ...p, pageNumber: p.pageNumber + 1 }))}
+                disabled={
+                  displayPagination.pageNumber === displayPagination.totalPages ||
+                  isFetching
+                }
+                onClick={() =>
+                  isDateFilterActive
+                    ? setLocalPage((p) => p + 1)
+                    : setFilter((p) => ({ ...p, pageNumber: p.pageNumber + 1 }))
+                }
                 className="h-9 w-9 p-0 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg"
               >
                 <ChevronRight className="h-4 w-4" />

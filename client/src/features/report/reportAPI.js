@@ -32,8 +32,8 @@ export const reportApi = apiClient.injectEndpoints({
         sendReportNow: builder.mutation({
             query: ({ from, to }) => ({
                 url: "/report/send-now",
-                method: "GET",
-                params: { from, to },
+                method: "POST",
+                body: { from, to },
             }),
             invalidatesTags: ["reports"],
         }),

@@ -296,7 +296,7 @@ export const chatbotService = async (userId, message, conversationHistory = []) 
     while (retries <= MAX_RETRIES) {
       try {
         result = await genAI.models.generateContent({ model, contents, config: genConfig });
-        console.log(`✅ Chatbot using model: ${model}`);
+        // console.log(`✅ Chatbot using model: ${model}`);
         break; // success
       } catch (err) {
         lastError = err;
@@ -361,9 +361,18 @@ export const chatbotService = async (userId, message, conversationHistory = []) 
       aiData = JSON.parse(cleaned);
     } catch (parseError) {
       console.error("Gemini JSON Parsing Error:", parseError, "Raw:", rawResponse);
-      const replyMatch = rawResponse.match(/"reply":\s*"([^"]*)"/);
+      
+      // Safety extraction: grabs everything after "reply": " even without the closing quote
+      let extractedReply = rawResponse;
+      const replyMatch = rawResponse.match(/"reply":\s*"([\s\S]*)/);
+      
+      if (replyMatch && replyMatch[1]) {
+        // Strip out trailing incomplete quotes or braces if they exist at the very end
+        extractedReply = replyMatch[1].replace(/["}]+$/, '').trim(); 
+      }
+
       aiData = {
-        reply: replyMatch ? replyMatch[1] : rawResponse.substring(0, 300),
+        reply: extractedReply,
         action: null,
       };
     }

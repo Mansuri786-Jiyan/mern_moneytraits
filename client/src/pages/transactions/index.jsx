@@ -5,7 +5,6 @@ import AddTransactionDrawer from "@/components/transaction/add-transaction-drawe
 import PremiumTransactionTable from "@/components/transaction/premium-transaction-table/index.jsx";
 import ImportTransactionModal from "@/components/transaction/import-transaction-modal";
 
-import GenerateReportDrawer from "./_components/generate-report-drawer";
 import ReportHistorySection from "./_components/report-history-section";
 import ExportButtons from "./_component/export-buttons";
 import { cn } from "@/lib/utils";
@@ -33,7 +32,6 @@ export default function Transactions() {
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              <GenerateReportDrawer />
               <ImportTransactionModal />
               <AddTransactionDrawer />
             </div>

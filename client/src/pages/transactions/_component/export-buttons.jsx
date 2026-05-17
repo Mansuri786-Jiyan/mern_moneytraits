@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Printer, Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
@@ -69,10 +69,6 @@ const ExportButtons = ({ filters }) => {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -87,14 +83,6 @@ const ExportButtons = ({ filters }) => {
           <Download className="h-4 w-4 mr-2" />
         )}
         Export CSV
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handlePrint}
-      >
-        <Printer className="h-4 w-4 mr-2" />
-        Print
       </Button>
     </div>
   );

@@ -18,6 +18,7 @@ import { useAppDispatch, useTypedSelector } from "@/app/hook";
 import { Loader } from "lucide-react";
 import { useUpdateUserMutation } from "@/features/user/userAPI";
 import { updateCredentials } from "@/features/auth/authSlice";
+import { ChangeEmailDialog } from "./change-email-dialog";
 
 const accountFormSchema = z.object({
   name: z
@@ -34,6 +35,7 @@ export function AccountForm() {
   const { user } = useTypedSelector((state) => state.auth);
   const [file, setFile] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [updateUserMutation, { isLoading }] = useUpdateUserMutation();
 
   const form = useForm({
@@ -55,6 +57,7 @@ export function AccountForm() {
         dispatch(
           updateCredentials({
             user: {
+              ...user,
               profilePicture: response.data.profilePicture,
               name: response.data.name,
             },
@@ -127,11 +130,21 @@ export function AccountForm() {
             </FormItem>
           )}
         />
+        <div className="space-y-2">
+          <FormLabel>Email</FormLabel>
+          <div className="flex gap-4 items-center">
+            <Input disabled value={user?.email || ""} className="max-w-[400px]" />
+            <Button type="button" variant="secondary" onClick={() => setIsEmailDialogOpen(true)}>
+              Change Email
+            </Button>
+          </div>
+        </div>
         <Button disabled={isLoading} type="submit">
           {isLoading && <Loader className="h-4 w-4 animate-spin mr-2" />}
           Update account
         </Button>
       </form>
+      <ChangeEmailDialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen} />
     </Form>
   );
 }

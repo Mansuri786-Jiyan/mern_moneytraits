@@ -125,7 +125,7 @@ export const emailReportController = asyncHandler(async (req, res) => {
 
 export const sendReportNowController = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
-    const { from, to } = req.query;
+    const { from, to } = req.body;
 
     if (!from || !to) {
         throw new BadRequestException("From and To dates are required");
@@ -172,6 +172,14 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         console.error("Error sending report now:", error);
+        
+        await ReportModel.create({
+            userId,
+            period: result.period,
+            sentDate: new Date(),
+            status: ReportStatusEnum.FAILED,
+        });
+
         return res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
             message: "Failed to send report",
         });
