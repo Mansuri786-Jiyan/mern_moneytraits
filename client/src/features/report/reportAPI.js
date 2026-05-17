@@ -37,6 +37,13 @@ export const reportApi = apiClient.injectEndpoints({
             }),
             invalidatesTags: ["reports"],
         }),
+        exportTransactions: builder.query({
+            query: ({ from, to }) => ({
+                url: "/report/export",
+                method: "GET",
+                params: { from, to },
+            }),
+        }),
     }),
 });
 
@@ -45,4 +52,5 @@ export const {
     useUpdateReportSettingMutation,
     useLazyGenerateReportQuery,
     useSendReportNowMutation,
+    useLazyExportTransactionsQuery,
 } = reportApi;

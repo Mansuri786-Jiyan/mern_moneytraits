@@ -9,7 +9,7 @@ import {
   Download,
 } from "lucide-react";
 import { useTypedSelector } from "@/app/hook";
-import { useLazyGenerateReportQuery, useSendReportNowMutation } from "@/features/report/reportAPI";
+import { useLazyGenerateReportQuery, useSendReportNowMutation, useLazyExportTransactionsQuery } from "@/features/report/reportAPI";
 import { formatCurrency } from "@/lib/format-currency";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -38,15 +38,22 @@ const GenerateReportSection = () => {
 
   const { user } = useTypedSelector((state) => state.auth);
   const [triggerGenerate] = useLazyGenerateReportQuery();
+  const [triggerExport] = useLazyExportTransactionsQuery();
   const [sendReportNow] = useSendReportNowMutation();
 
   const handleSendEmail = async () => {
     if (!fromDate || !toDate) return;
     setIsSending(true);
     try {
+      const fromBoundary = new Date(fromDate);
+      fromBoundary.setHours(0, 0, 0, 0);
+
+      const toBoundary = new Date(toDate);
+      toBoundary.setHours(23, 59, 59, 999);
+
       const result = await sendReportNow({
-        from: fromDate.toISOString(),
-        to: toDate.toISOString(),
+        from: fromBoundary.toISOString(),
+        to: toBoundary.toISOString(),
       }).unwrap();
       toast.success(result.message || `Report sent to ${user?.email}`);
     } catch (error) {
@@ -57,24 +64,56 @@ const GenerateReportSection = () => {
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleExportCSV = async () => {
     if (!fromDate || !toDate) return;
     setIsDownloading(true);
     try {
-      const result = await triggerGenerate({
-        from: fromDate.toISOString(),
-        to: toDate.toISOString(),
+      const fromBoundary = new Date(fromDate);
+      fromBoundary.setHours(0, 0, 0, 0);
+
+      const toBoundary = new Date(toDate);
+      toBoundary.setHours(23, 59, 59, 999);
+
+      const result = await triggerExport({
+        from: fromBoundary.toISOString(),
+        to: toBoundary.toISOString(),
       }).unwrap();
-      setReportData(result);
-      
-      // Wait for DOM to update print-only area, then print
-      setTimeout(() => {
-        window.print();
-        setIsDownloading(false);
-      }, 500);
+
+      const transactions = result.transactions || [];
+      if (transactions.length === 0) {
+        toast.info("No transactions found for the selected period.");
+        return;
+      }
+
+      // Generate CSV Content
+      const headers = "Date,Title,Type,Category,Amount (INR),Payment Method,Status\n";
+      const rows = transactions.map((t) => {
+        const dateStr = format(new Date(t.date), "yyyy-MM-dd");
+        const title = `"${t.title.replace(/"/g, '""')}"`;
+        const type = t.type;
+        const category = `"${t.category.replace(/"/g, '""')}"`;
+        const amount = (t.amount / 100).toFixed(2);
+        const paymentMethod = t.paymentMethod || "CASH";
+        const status = t.status || "COMPLETED";
+        return `${dateStr},${title},${type},${category},${amount},${paymentMethod},${status}`;
+      }).join("\n");
+
+      const csvContent = headers + rows;
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Moneytraits_Statement_${format(fromDate, "yyyyMMdd")}_to_${format(toDate, "yyyyMMdd")}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("CSV file exported successfully!");
     } catch (error) {
-      console.error("Download PDF error:", error);
-      toast.error("Failed to generate PDF report.");
+      console.error("Export CSV error:", error);
+      toast.error("Failed to generate CSV report.");
+    } finally {
       setIsDownloading(false);
     }
   };
@@ -184,11 +223,11 @@ const GenerateReportSection = () => {
                 ) : (
                   <Mail className="h-4 w-4" />
                 )}
-                {isSending ? "Sending..." : "Email Statement"}
+                {isSending ? "Sending..." : "Email Report"}
               </Button>
 
               <Button
-                onClick={handleDownloadPDF}
+                onClick={handleExportCSV}
                 disabled={!fromDate || !toDate || isDownloading}
                 variant="outline"
                 className="h-11 px-5 rounded-xl shadow-sm active:scale-95 transition-all flex items-center gap-2"
@@ -198,7 +237,7 @@ const GenerateReportSection = () => {
                 ) : (
                   <Download className="h-4 w-4" />
                 )}
-                {isDownloading ? "Preparing..." : "Download PDF"}
+                {isDownloading ? "Exporting..." : "Export CSV"}
               </Button>
             </div>
           </div>

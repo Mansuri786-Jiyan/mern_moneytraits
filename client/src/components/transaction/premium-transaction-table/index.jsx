@@ -46,7 +46,11 @@ import {
   useDuplicateTransactionMutation,
 } from "@/features/transaction/transactionAPI";
 import { useGetCategoriesQuery } from "@/features/category/categoryAPI";
-import { useSendReportNowMutation } from "@/features/report/reportAPI";
+import {
+  useSendReportNowMutation,
+  useLazyGenerateReportQuery,
+  useLazyExportTransactionsQuery,
+} from "@/features/report/reportAPI";
 import { useTypedSelector } from "@/app/hook";
 import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -79,6 +83,7 @@ const PremiumTransactionTable = ({
 
   const { accessToken, user } = useTypedSelector((state) => state.auth);
   const [sendReportNow] = useSendReportNowMutation();
+  const [triggerExport] = useLazyExportTransactionsQuery();
 
   // Hooks for actions
   const { onOpenDrawer } = useEditTransactionDrawer();
@@ -159,9 +164,15 @@ const PremiumTransactionTable = ({
     if (!fromDate || !toDate) return;
     setIsSending(true);
     try {
+      const fromBoundary = new Date(fromDate);
+      fromBoundary.setHours(0, 0, 0, 0);
+
+      const toBoundary = new Date(toDate);
+      toBoundary.setHours(23, 59, 59, 999);
+
       await sendReportNow({
-        from: fromDate.toISOString(),
-        to: toDate.toISOString(),
+        from: fromBoundary.toISOString(),
+        to: toBoundary.toISOString(),
       }).unwrap();
       toast.success(`Statement report sent to ${user?.email}`);
     } catch (error) {
@@ -172,145 +183,56 @@ const PremiumTransactionTable = ({
     }
   };
 
-  const handlePrintPDF = async () => {
+  const handleExportCSV = async () => {
     if (!fromDate || !toDate) return;
     setIsDownloading(true);
     try {
-      const baseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:8010/api";
-      const url = `${baseUrl}/report/generate?from=${fromDate.toISOString()}&to=${toDate.toISOString()}`;
+      const fromBoundary = new Date(fromDate);
+      fromBoundary.setHours(0, 0, 0, 0);
 
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const toBoundary = new Date(toDate);
+      toBoundary.setHours(23, 59, 59, 999);
 
-      const json = await res.json();
-      if (!res.ok) {
-        toast.error(json.message || "No transactions in this period");
-        setIsDownloading(false);
+      const result = await triggerExport({
+        from: fromBoundary.toISOString(),
+        to: toBoundary.toISOString(),
+      }).unwrap();
+
+      const transactions = result.transactions || [];
+      if (transactions.length === 0) {
+        toast.info("No transactions found for the selected period.");
         return;
       }
 
-      const activeReportData = json.data;
+      // Generate CSV Content
+      const headers = "Date,Title,Type,Category,Amount (INR),Payment Method,Status\n";
+      const rows = transactions.map((t) => {
+        const dateStr = format(new Date(t.date), "yyyy-MM-dd");
+        const title = `"${t.title.replace(/"/g, '""')}"`;
+        const type = t.type;
+        const category = `"${t.category.replace(/"/g, '""')}"`;
+        const amount = (t.amount / 100).toFixed(2);
+        const paymentMethod = t.paymentMethod || "CASH";
+        const status = t.status || "COMPLETED";
+        return `${dateStr},${title},${type},${category},${amount},${paymentMethod},${status}`;
+      }).join("\n");
 
-      const printArea = document.createElement("div");
-      printArea.id = "report-print-area";
-      printArea.style.fontFamily = "Arial, sans-serif";
-      printArea.style.padding = "40px";
-      printArea.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #00bc7d; margin: 0; font-size: 32px;">Moneytraits</h1>
-          <p style="color: #666; font-size: 14px; margin-top: 5px;">Your personal companion for finance</p>
-        </div>
-        <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Financial Report — ${
-          activeReportData.period
-        }</h2>
-        
-        <div style="margin-bottom: 30px;">
-          <p><strong>Generated for:</strong> ${user?.name} (${user?.email})</p>
-          <p><strong>Date range:</strong> ${activeReportData.period}</p>
-        </div>
+      const csvContent = headers + rows;
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Moneytraits_Statement_${format(fromDate, "yyyyMMdd")}_to_${format(toDate, "yyyyMMdd")}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd;">
-          <tr style="background-color: #f9f9f9;">
-            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Category</th>
-            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Details</th>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Income</strong></td>
-            <td style="border: 1px solid #ddd; padding: 12px; color: #22c55e; font-weight: bold;">${formatCurrency(
-              activeReportData.summary.income
-            )}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Total Expenses</strong></td>
-            <td style="border: 1px solid #ddd; padding: 12px; color: #ef4444; font-weight: bold;">${formatCurrency(
-              activeReportData.summary.expenses
-            )}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Net Balance</strong></td>
-            <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">${formatCurrency(
-              activeReportData.summary.balance
-            )}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #ddd; padding: 12px;"><strong>Savings Rate</strong></td>
-            <td style="border: 1px solid #ddd; padding: 12px;">${
-              activeReportData.summary.savingsRate
-            }%</td>
-          </tr>
-        </table>
-
-        ${
-          activeReportData.summary.topCategories.length > 0
-            ? `
-          <h3 style="margin-top: 30px; margin-bottom: 15px;">Top Spending Categories</h3>
-          <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-            <thead>
-              <tr style="background-color: #f9f9f9;">
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Category</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Percentage</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${activeReportData.summary.topCategories
-                .map(
-                  (cat) => `
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 12px; text-transform: capitalize;">${cat.name}</td>
-                  <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${cat.percent}%</td>
-                  <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${formatCurrency(
-                    cat.amount
-                  )}</td>
-                </tr>
-              `
-                )
-                .join("")}
-            </tbody>
-          </table>
-        `
-            : ""
-        }
-
-        ${
-          activeReportData.insights && activeReportData.insights.length > 0
-            ? `
-          <h3 style="margin-top: 30px; margin-bottom: 15px;">AI Insights</h3>
-          <ul style="padding-left: 20px; color: #444;">
-            ${activeReportData.insights
-              .map(
-                (insight) => `
-              <li style="margin-bottom: 8px;">${insight}</li>
-            `
-              )
-              .join("")}
-          </ul>
-        `
-            : ""
-        }
-
-        <div style="margin-top: 50px; text-align: center; color: #888; font-size: 11px; border-top: 1px solid #eee; padding-top: 20px;">
-          <p>© ${new Date().getFullYear()} Moneytraits - Secure Personal Finance Management</p>
-          <p>Generated on ${format(new Date(), "MMMM dd, yyyy")}</p>
-        </div>
-      `;
-
-      document.body.appendChild(printArea);
-      window.print();
-      setIsDownloading(false);
-
-      window.onafterprint = () => {
-        document.getElementById("report-print-area")?.remove();
-      };
-
+      toast.success("CSV file exported successfully!");
     } catch (error) {
-      console.error("Print PDF error:", error);
-      toast.error("Failed to generate PDF statement.");
+      console.error("Export CSV error:", error);
+      toast.error("Failed to generate CSV statement.");
+    } finally {
       setIsDownloading(false);
     }
   };
@@ -566,11 +488,11 @@ const PremiumTransactionTable = ({
               ) : (
                 <Mail className="h-4 w-4" />
               )}
-              {isSending ? "Sending..." : "Email Statement"}
+              {isSending ? "Sending..." : "Email Report"}
             </Button>
 
             <Button
-              onClick={handlePrintPDF}
+              onClick={handleExportCSV}
               disabled={!fromDate || !toDate || isDownloading}
               variant="outline"
               className="flex-1 lg:flex-none h-10 rounded-xl px-4 shadow-sm border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-2 active:scale-95 transition-all"
@@ -580,7 +502,7 @@ const PremiumTransactionTable = ({
               ) : (
                 <Download className="h-4 w-4" />
               )}
-              {isDownloading ? "Preparing..." : "Download PDF"}
+              {isDownloading ? "Exporting..." : "Export CSV"}
             </Button>
           </div>
         </div>

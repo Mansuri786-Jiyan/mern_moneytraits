@@ -10,6 +10,14 @@ import { genAI, genAIModel } from "../config/google-ai.config.js";
 import { createUserContent } from "@google/genai";
 import { reportInsightPrompt } from "../utils/prompt.js";
 
+export const exportTransactionsService = async (userId, fromDate, toDate) => {
+    const transactions = await TransactionModel.find({
+        userId: new mongoose.Types.ObjectId(userId),
+        date: { $gte: fromDate, $lte: toDate },
+    }).sort({ date: -1 });
+    return transactions;
+};
+
 export const getAllReportsService = async (userId, pagination) => {
     const query = { userId };
     const { pageSize, pageNumber } = pagination;

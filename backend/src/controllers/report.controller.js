@@ -1,6 +1,6 @@
 import { asyncHandler } from "../middlewares/asyncHandler.middlerware.js";
 import { HTTPSTATUS } from "../config/http.config.js";
-import { getAllReportsService, updateReportSettingService, generateReportService } from "../services/report.service.js";
+import { getAllReportsService, updateReportSettingService, generateReportService, exportTransactionsService } from "../services/report.service.js";
 import { updateReportSettingSchema } from "../validators/report.validator.js";
 import { sendEmail } from "../mailers/mailer.js";
 import { getReportEmailTemplate } from "../mailers/templates/report.template.js";
@@ -8,6 +8,7 @@ import UserModel from "../models/user.model.js";
 import ReportModel, { ReportStatusEnum } from "../models/report.model.js";
 import { sendReportEmail } from "../mailers/report.mailer.js";
 import { BadRequestException } from "../utils/app-error.js";
+import mongoose from "mongoose";
 
 export const getAllReportsController = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
@@ -45,6 +46,35 @@ export const generateReportController = asyncHandler(async (req, res) => {
 
         const result = await generateReportService(userId, fromDate, toDate);
 
+        // LOGGING SYSTEM
+        try {
+            const fs = await import("fs");
+            const totalCount = await mongoose.connection.collection("transactions").countDocuments({});
+            const userCount = await mongoose.connection.collection("transactions").countDocuments({
+                userId: new mongoose.Types.ObjectId(userId)
+            });
+            const matchedDateCount = await mongoose.connection.collection("transactions").countDocuments({
+                userId: new mongoose.Types.ObjectId(userId),
+                date: { $gte: fromDate, $lte: toDate }
+            });
+            fs.appendFileSync("request_log.txt", JSON.stringify({
+                timestamp: new Date().toISOString(),
+                userId,
+                query: req.query,
+                fromDateStr: fromDate.toISOString(),
+                toDateStr: toDate.toISOString(),
+                hasResult: !!result,
+                transactionsCount: result?.transactions?.length || 0,
+                databaseCheck: {
+                    totalTransactionsInDb: totalCount,
+                    userTransactionsInDb: userCount,
+                    matchedDateTransactionsInDb: matchedDateCount
+                }
+            }, null, 2) + "\n");
+        } catch (err) {
+            console.error("Logging failed:", err);
+        }
+
         if (!result) {
             return res.status(HTTPSTATUS.NOT_FOUND).json({
                 message: "No transactions found for this period",
@@ -66,7 +96,7 @@ export const generateReportController = asyncHandler(async (req, res) => {
 export const emailReportController = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
     const { from, to } = req.body;
-    
+
     if (!from || !to) {
         return res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "From and To dates are required" });
     }
@@ -77,7 +107,7 @@ export const emailReportController = asyncHandler(async (req, res) => {
     if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
         return res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "Invalid date format provided." });
     }
-    
+
     const result = await generateReportService(userId, fromDate, toDate);
 
     if (!result) {
@@ -172,7 +202,7 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
         });
     } catch (error) {
         console.error("Error sending report now:", error);
-        
+
         await ReportModel.create({
             userId,
             period: result.period,
@@ -182,6 +212,38 @@ export const sendReportNowController = asyncHandler(async (req, res) => {
 
         return res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
             message: "Failed to send report",
+        });
+    }
+});
+
+export const exportTransactionsController = asyncHandler(async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        const { from, to } = req.query;
+
+        if (!from || !to) {
+            return res.status(HTTPSTATUS.BAD_REQUEST).json({ message: "From and To dates are required" });
+        }
+
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+
+        const transactions = await exportTransactionsService(userId, fromDate, toDate);
+
+        if (!transactions || transactions.length === 0) {
+            return res.status(HTTPSTATUS.NOT_FOUND).json({
+                message: "No transactions found for the selected period.",
+            });
+        }
+
+        return res.status(HTTPSTATUS.OK).json({
+            message: "Transactions exported successfully",
+            transactions,
+        });
+    } catch (error) {
+        console.error("Error in exportTransactionsController:", error);
+        return res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
+            message: "An error occurred while exporting transactions.",
         });
     }
 });
